@@ -6,6 +6,7 @@ const config: Config = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -42,6 +43,14 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Dark theme colors inspired by Supabase
+        dark: {
+          bg: '#000000',       // pure black
+          surface: '#0a0a0a',  // very dark gray
+          border: '#1a1a1a',   // darker border
+          text: '#f8fafc',     // slate-50
+          muted: '#71717a',    // zinc-500
+        }
       },
       borderRadius: {
         lg: "var(--radius)",

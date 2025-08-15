@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "AgentHub - Centralized platform for managing AI-powered business automation agents",
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "npm@10.0.0",
   "workspaces": [
     "apps/*",
     "services/*",
@@ -11,11 +11,11 @@
   ],
   "scripts": {
     "dev": "concurrently -k -n SHARED,API,WEB \"npm run dev -w @agent-hub/shared\" \"npm run dev -w @agent-hub/agent-hub\" \"npm run dev -w @agent-hub/portal\"",
-    "build": "pnpm -r build",
-    "lint": "pnpm -r lint",
+    "build": "npm run build --workspaces",
+    "lint": "npm run lint --workspaces",
     "format": "prettier --write .",
-    "clean": "pnpm -r clean && rimraf node_modules",
-    "typecheck": "pnpm -r typecheck"
+    "clean": "npm run clean --workspaces && rimraf node_modules",
+    "typecheck": "npm run typecheck --workspaces"
   },
   "eslintConfig": {
     "root": true,
@@ -43,6 +43,6 @@
   },
   "engines": {
     "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
+    "npm": ">=8.0.0"
   }
 }

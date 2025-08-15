@@ -1,0 +1,48 @@
+{
+  "name": "agent-hub-v2",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AgentHub - Centralized platform for managing AI-powered business automation agents",
+  "packageManager": "pnpm@9.0.0",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n SHARED,API,WEB \"npm run dev -w @agent-hub/shared\" \"npm run dev -w @agent-hub/agent-hub\" \"npm run dev -w @agent-hub/portal\"",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "format": "prettier --write .",
+    "clean": "pnpm -r clean && rimraf node_modules",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "eslintConfig": {
+    "root": true,
+    "ignorePatterns": ["node_modules", "dist"],
+    "overrides": [
+      {
+        "files": ["**/*.ts", "**/*.tsx"],
+        "parserOptions": { "project": false },
+        "extends": ["eslint:recommended"],
+        "rules": {}
+      }
+    ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "semi": true,
+    "tabWidth": 2,
+    "trailingComma": "es5"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prettier": "^3.3.3",
+    "eslint": "^8.57.0",
+    "rimraf": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

@@ -2,19 +2,16 @@ import { logger } from "./logger.js";
 
 // Optional Langfuse integration for observability
 let langfuse: any = null;
+let langfuseInitialized = false;
 
-try {
-  if (process.env.LANGFUSE_SECRET_KEY) {
-    const { Langfuse } = await import("@langfuse/node");
-    langfuse = new Langfuse({
-      secretKey: process.env.LANGFUSE_SECRET_KEY,
-      publicKey: process.env.LANGFUSE_PUBLIC_KEY,
-      baseUrl: process.env.LANGFUSE_BASE_URL,
-    });
-    logger.info("Langfuse initialized for observability");
-  }
-} catch (error) {
-  logger.warn({ error }, "Langfuse not available (optional dependency)");
+async function initLangfuse() {
+  if (langfuseInitialized) return;
+  
+  // Langfuse is optional - currently disabled to avoid dependency issues
+  // To enable: install @langfuse/node and set LANGFUSE_SECRET_KEY
+  logger.info("Langfuse integration disabled (optional observability feature)");
+  
+  langfuseInitialized = true;
 }
 
 export async function startRunTrace(
@@ -23,6 +20,7 @@ export async function startRunTrace(
   agent: string,
   input: unknown
 ) {
+  await initLangfuse();
   if (!langfuse) return;
   
   try {
@@ -52,6 +50,7 @@ export async function endRunTrace(
     latencyMs?: number;
   }
 ) {
+  await initLangfuse();
   if (!langfuse) return;
   
   try {

@@ -76,6 +76,99 @@ callbacksRouter.post("/n8n", async (req, res) => {
   }
 });
 
+// Conversation-specific callback (optimized for chatbot)
+callbacksRouter.post("/conversation", async (req, res) => {
+  try {
+    const {
+      runId,
+      status,
+      output,
+      error: errorMsg,
+      costUsd,
+      latencyMs,
+    } = req.body;
+
+    logger.info({ runId, status }, 'Received conversation callback');
+
+    // Update the run record
+    const { error: updateError } = await supabaseAdmin
+      .from('runs')
+      .update({
+        status,
+        output,
+        error: errorMsg,
+        cost_usd: costUsd,
+        latency_ms: latencyMs,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', runId);
+
+    if (updateError) {
+      logger.error({ error: updateError }, 'Failed to update conversation run');
+      return res.status(500).json(createApiResponse(null, 'Failed to update run'));
+    }
+
+    // Store conversation in memory if successful
+    if (status === 'success' && output?.message) {
+      const { data: runData } = await supabaseAdmin
+        .from('runs')
+        .select('input, project_id')
+        .eq('id', runId)
+        .single();
+
+      if (runData?.input?.session_id) {
+        const sessionId = runData.input.session_id;
+        const projectId = runData.project_id || process.env.DEFAULT_PROJECT_ID;
+
+        // Store user message
+        await supabaseAdmin.from('memory').insert({
+          project_id: projectId,
+          doc_id: sessionId,
+          content: runData.input.message,
+          metadata: {
+            message_type: 'user',
+            timestamp: new Date().toISOString(),
+            session_id: sessionId
+          }
+        });
+
+        // Store assistant response
+        await supabaseAdmin.from('memory').insert({
+          project_id: projectId,
+          doc_id: sessionId,
+          content: output.message,
+          metadata: {
+            message_type: 'bot',
+            timestamp: new Date().toISOString(),
+            session_id: sessionId,
+            tokens_used: output.tokens_used,
+            cost_usd: costUsd
+          }
+        });
+      }
+    }
+
+    // Broadcast real-time update
+    await broadcastRunUpdate(runId, {
+      type: "conversation_complete",
+      payload: { 
+        runId, 
+        status, 
+        message: output?.message,
+        session_id: output?.session_id,
+        costUsd, 
+        latencyMs,
+        error: errorMsg,
+      },
+    }).catch((e) => logger.warn({ e }, "Conversation broadcast failed"));
+
+    res.json(createApiResponse({ success: true }));
+  } catch (error) {
+    logger.error({ error }, 'Conversation callback error');
+    res.status(500).json(createApiResponse(null, 'Internal server error'));
+  }
+});
+
 // Health check for n8n
 callbacksRouter.get("/health", (req, res) => {
   res.json(createApiResponse({ 

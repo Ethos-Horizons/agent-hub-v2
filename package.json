@@ -15,7 +15,9 @@
     "lint": "npm run lint --workspaces",
     "format": "prettier --write .",
     "clean": "npm run clean --workspaces && rimraf node_modules",
-    "typecheck": "npm run typecheck --workspaces"
+    "typecheck": "npm run typecheck --workspaces",
+    "dev:check": "npm run typecheck && npm run lint",
+    "doctor": "node scripts/doctor.js"
   },
   "eslintConfig": {
     "root": true,

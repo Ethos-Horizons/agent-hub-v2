@@ -15,6 +15,7 @@
   "dependencies": {
     "@agent-hub/shared": "*",
     "@supabase/supabase-js": "^2.45.4",
+    "@types/uuid": "^10.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
@@ -28,13 +29,13 @@
     "@langfuse/node": "^3.16.0"
   },
   "devDependencies": {
-    "tsx": "^4.16.2",
-    "typescript": "^5.5.4",
-    "eslint": "^8.57.0",
+    "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/node": "^20.14.10",
-    "@types/cors": "^2.8.17",
+    "eslint": "^8.57.0",
     "pino-pretty": "^11.2.2",
-    "rimraf": "^5.0.0"
+    "rimraf": "^5.0.0",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.4"
   }
 }

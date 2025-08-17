@@ -5,6 +5,7 @@ import { runsRouter } from "./routes/runs.js";
 import { callbacksRouter } from "./routes/callbacks.js";
 import { agentsRouter } from "./routes/agents.js";
 import { conversationsRouter } from "./routes/conversations.js";
+import { conversationRouter } from "./routes/conversation.js";
 import { logger } from "./lib/logger.js";
 
 const app = express();
@@ -23,6 +24,7 @@ app.use("/runs", runsRouter);
 app.use("/callbacks", callbacksRouter);
 app.use("/agents", agentsRouter);
 app.use("/conversations", conversationsRouter);
+app.use("/conversation", conversationRouter); // Main chatbot endpoint
 
 // Error handling
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

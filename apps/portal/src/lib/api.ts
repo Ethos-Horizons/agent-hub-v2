@@ -48,10 +48,11 @@ export async function getRuns(projectId: string, params?: {
   offset?: number
   status?: string
 }) {
-  const searchParams = new URLSearchParams({
-    projectId,
-    ...params,
-  })
+  const searchParams = new URLSearchParams({ projectId })
+  
+  if (params?.limit) searchParams.set('limit', params.limit.toString())
+  if (params?.offset) searchParams.set('offset', params.offset.toString()) 
+  if (params?.status) searchParams.set('status', params.status)
   
   return request<ApiResponse<{
     items: any[]

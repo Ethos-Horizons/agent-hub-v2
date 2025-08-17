@@ -90,8 +90,8 @@ n8n Design → AgentHub Import → Vector Storage → API Calls → External App
 ## 🚀 Getting Started
 
 ### **Prerequisites:**
-- Node.js 18+
-- npm 8+
+- Node.js 20+
+- npm 10+
 - Supabase account with pgvector enabled
 - n8n instance for agent design
 
@@ -101,17 +101,84 @@ n8n Design → AgentHub Import → Vector Storage → API Calls → External App
 git clone <repository-url>
 cd AgentHub && npm install
 
+# Environment health check
+npm run doctor
+
 # Configure environment
-cp env.example .env
-# Add your Supabase, n8n, and Langfuse credentials
+cp env.template apps/portal/.env.local
+cp env.template services/agent-hub/.env
+# Add your Supabase, n8n, and security credentials
+
+# Database setup
+# Run setup-project.sql in Supabase SQL editor
 
 # Start development
 npm run dev
 ```
 
 **Endpoints:**
-- **Internal Dashboard**: http://localhost:3000 (Team access only)
+- **Internal Dashboard**: http://localhost:3001 (Team access only)
 - **Agent API**: http://localhost:5000 (External application access)
+
+## 🚢 Deploy Playbook
+
+### **Environment Variables**
+
+| Variable | Frontend | Backend | Required | Description |
+|----------|----------|---------|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | ✅ | ✅ | ✅ | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | ✅ | ✅ | Supabase anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | ❌ | ✅ | ✅ | Service role key (server-only) |
+| `HMAC_WEBHOOK_SECRET` | ❌ | ✅ | ✅ | 32+ char webhook secret |
+| `N8N_BASE_URL` | ❌ | ✅ | ⚠️ | n8n instance URL |
+| `DEFAULT_TENANT_ID` | ❌ | ✅ | ⚠️ | Default org UUID |
+
+### **Pre-Deploy Checklist**
+
+```bash
+# 1. Environment validation
+npm run doctor
+
+# 2. Type checking
+npm run typecheck
+
+# 3. Build verification
+npm run build
+
+# 4. Security check
+grep -r "SUPABASE_SERVICE_ROLE_KEY" apps/portal/src/ || echo "✅ No service key in client"
+```
+
+### **Deployment Steps**
+
+1. **Database Migration**
+   - Run `setup-project.sql` in Supabase
+   - Verify RLS policies are active
+   - Test with limited user account
+
+2. **Environment Setup**
+   - Set all required environment variables
+   - Generate secure `HMAC_WEBHOOK_SECRET` (32+ chars)
+   - Verify CORS domains match your deployment URLs
+
+3. **Deploy & Monitor**
+   - Deploy backend service first
+   - Test health endpoints: `/api/health` and `/api/v1/health`
+   - Deploy frontend
+   - Monitor error rates for first 24h
+
+### **Rollback Procedure**
+
+```bash
+# 1. Identify last working version
+git log --oneline -10
+
+# 2. Revert deployment
+git checkout <last-working-commit>
+
+# 3. Redeploy
+npm run build && deploy
+```
 
 ## 📁 Project Structure
 

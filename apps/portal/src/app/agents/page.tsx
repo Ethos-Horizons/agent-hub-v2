@@ -147,7 +147,7 @@ export default function AgentsPage() {
                     <h3 className="text-lg font-semibold text-white">{agent.name}</h3>
                     <span className={`
                       px-2 py-1 text-xs font-medium rounded-full border
-                      ${categoryColors[agent.category as keyof typeof categoryColors] || categoryColors.Content}
+                      ${categoryColors[agent.category as keyof typeof categoryColors] || categoryColors['Customer Interaction']}
                     `}>
                       {agent.category}
                     </span>

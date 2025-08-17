@@ -40,18 +40,70 @@ export const N8nCallbackPayload = z.object({
 
 export type N8nCallbackPayloadT = z.infer<typeof N8nCallbackPayload>;
 
-// Database entity types matching your existing Supabase schema
+// Conversation-specific schemas for chatbot integration
+export const ConversationRequest = z.object({
+  message: z.string().min(1),
+  session_id: z.string().optional(),
+  user_id: z.string().optional(),
+  context: z.object({
+    page: z.string().optional(),
+    user_agent: z.string().optional(),
+    referrer: z.string().optional(),
+  }).optional(),
+});
+
+export const ConversationResponse = z.object({
+  id: z.string().uuid(),
+  message: z.string(),
+  session_id: z.string(),
+  status: z.enum(["processing", "completed", "error"]),
+  metadata: z.object({
+    response_time_ms: z.number().optional(),
+    tokens_used: z.number().optional(),
+    cost_usd: z.number().optional(),
+  }).optional(),
+});
+
+export const MemoryUpdate = z.object({
+  session_id: z.string(),
+  content: z.string(),
+  metadata: z.object({
+    message_type: z.enum(["user", "assistant"]),
+    timestamp: z.string(),
+    tokens: z.number().optional(),
+  }),
+});
+
+export type ConversationRequestT = z.infer<typeof ConversationRequest>;
+export type ConversationResponseT = z.infer<typeof ConversationResponse>;
+export type MemoryUpdateT = z.infer<typeof MemoryUpdate>;
+
+// Schema objects already exported above with const declarations
+
+// Database entity types matching your Supabase multi-tenant schema
 export type Organization = {
   id: string;
   name: string;
+  slug: string;
+  settings: Record<string, any>;
   created_at: string;
+  updated_at: string;
 };
 
-export type Project = {
+export type Profile = {
+  id: string;
+  email: string;
+  display_name?: string;
+  avatar_url?: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type OrgMember = {
   id: string;
   org_id: string;
-  name: string;
-  plan: string;
+  user_id: string;
+  role: 'owner' | 'admin' | 'member';
   created_at: string;
 };
 
@@ -80,15 +132,16 @@ export type Artifact = {
   created_at: string;
 };
 
-// Agent types from your existing schema
+// Updated Agent type for multi-tenant schema (matches database)
 export type Agent = {
   id: string;
+  tenant_id: string;
   name: string;
   type: string;
   description?: string;
-  status: string;
+  status: 'active' | 'inactive';
   version: string;
-  config: any;
+  config: Record<string, any>;
   created_at: string;
   updated_at: string;
 };
@@ -119,25 +172,31 @@ export type AgentMemory = {
   access_count: number;
 };
 
-// Conversation types
+// Updated Conversation types for multi-tenant schema (matches database)
 export type Conversation = {
   id: string;
+  tenant_id: string;
   visitor_id: string;
   session_id: string;
   start_time: string;
   end_time?: string;
-  status: string;
+  status: 'active' | 'ended';
   intent?: string;
   lead_qualified: boolean;
+  created_at: string;
+  updated_at: string;
 };
 
 export type Message = {
   id: string;
   conversation_id: string;
-  message_type: "user" | "bot";
+  tenant_id: string;
+  message_type: 'user' | 'bot';
   content: string;
   timestamp: string;
-  metadata: any;
+  metadata: Record<string, any>;
+  created_at: string;
+  updated_at: string;
 };
 
 export type Lead = {
@@ -165,15 +224,7 @@ export type KnowledgeBase = {
   updated_at: string;
 };
 
-// System types
-export type ApiKey = {
-  id: string;
-  provider: string;
-  key_name: string;
-  encrypted_key: string;
-  is_active: boolean;
-  created_at: string;
-};
+// System types (ApiKey moved to end of file for multi-tenant version)
 
 export type SystemSetting = {
   id: string;
@@ -259,3 +310,14 @@ export type KnowledgeSearchResult = VectorSearchResult<{
   source_type: string;
   metadata: any;
 }>;
+
+export type ApiKey = {
+  id: string;
+  tenant_id: string;
+  provider: string;
+  key_name: string;
+  encrypted_key: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};

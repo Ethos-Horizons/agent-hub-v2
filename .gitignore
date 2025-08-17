@@ -177,6 +177,32 @@ coverage/
 config/production.json
 secrets/
 .secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Production-specific files
+.env.production
+.env.staging
+deploy.sh
+docker-compose.prod.yml
+
+# Security-sensitive files
+auth-secrets.json
+service-account.json
+google-credentials.json
+supabase-service-key.json
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Personal notes and TODOs (optional)
+NOTES.md
+TODO.md
+PRIVATE.md
 
 # Package manager lock files (keep package-lock.json for npm, comment out if using pnpm/yarn exclusively)
 # package-lock.json

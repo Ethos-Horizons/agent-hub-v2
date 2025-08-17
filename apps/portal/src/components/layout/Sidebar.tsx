@@ -11,8 +11,11 @@ import {
   Settings, 
   Database,
   Zap,
-  TrendingUp
+  TrendingUp,
+  LogOut,
+  User
 } from 'lucide-react'
+import { useAuth } from '@/components/auth/AuthProvider'
 
 interface NavItem {
   href: string
@@ -34,6 +37,7 @@ const navItems: NavItem[] = [
 export function Sidebar() {
   const pathname = usePathname()
   const [isExpanded, setIsExpanded] = useState(false)
+  const { user, signOut } = useAuth()
 
   return (
     <aside 
@@ -144,6 +148,45 @@ export function Sidebar() {
             <div className="text-sm font-medium text-white whitespace-nowrap">All Systems</div>
             <div className="text-xs text-zinc-400 whitespace-nowrap">Operational</div>
           </div>
+        </div>
+        
+        {/* User info and logout */}
+        <div className="border-t border-zinc-800 p-4 space-y-3">
+          {/* User info */}
+          <div className={`
+            flex items-center gap-3 p-2 rounded-lg transition-all duration-300
+            ${isExpanded ? 'bg-zinc-900/50' : 'justify-center'}
+          `}>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-400/20">
+              <User className="h-4 w-4 text-cyan-400" />
+            </div>
+            <div className={`
+              transition-all duration-300 overflow-hidden
+              ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
+            `}>
+              <div className="text-sm font-medium text-white whitespace-nowrap">
+                {user?.email?.split('@')[0] || 'User'}
+              </div>
+              <div className="text-xs text-zinc-400 whitespace-nowrap">Administrator</div>
+            </div>
+          </div>
+
+          {/* Logout button */}
+          <button
+            onClick={signOut}
+            className={`
+              flex w-full items-center gap-3 p-2 rounded-lg text-zinc-400 hover:text-red-400 hover:bg-red-400/10 transition-all duration-300
+              ${isExpanded ? '' : 'justify-center'}
+            `}
+          >
+            <LogOut className="h-4 w-4" />
+            <span className={`
+              text-sm font-medium transition-all duration-300 overflow-hidden whitespace-nowrap
+              ${isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0'}
+            `}>
+              Sign Out
+            </span>
+          </button>
         </div>
       </div>
     </aside>

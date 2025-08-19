@@ -17,6 +17,7 @@ import {
   Link,
   Database
 } from 'lucide-react'
+import { logger } from '@/lib/logger';
 
 // Mock n8n integration data
 const n8nStatus = {
@@ -129,10 +130,30 @@ export default function N8nSyncPage() {
     setIsRefreshing(false)
   }
 
-  const handleWorkflowAction = (workflowId: string, action: string) => {
-    console.log(`${action} workflow:`, workflowId)
-    // Implement workflow actions (pause, resume, test)
-  }
+  const handleWorkflowAction = async (workflowId: string, action: 'sync' | 'unsync') => {
+    try {
+      setLoading(workflowId);
+      logger.info(`${action} workflow`, { workflowId });
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (action === 'sync') {
+        setSyncedWorkflows(prev => [...prev, workflowId]);
+      } else {
+        setSyncedWorkflows(prev => prev.filter(id => id !== workflowId));
+      }
+      
+      setSuccess(`${action === 'sync' ? 'Synced' : 'Unsynced'} workflow successfully`);
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (error) {
+      logger.error('Workflow action failed', { workflowId, action, error });
+      setError(`Failed to ${action} workflow`);
+      setTimeout(() => setError(''), 3000);
+    } finally {
+      setLoading(null);
+    }
+  };
 
   const formatDuration = (ms: number) => {
     if (ms < 1000) return `${ms}ms`

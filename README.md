@@ -1,227 +1,301 @@
-# AgentHub
+# 🚀 Agent Hub - Agentic Platform
 
-**AI Agent Orchestration Platform** - A centralized backend system for managing, storing, and deploying n8n-designed automation agents with advanced vector storage and analytics capabilities.
+A modern, scalable platform for managing AI agents, n8n workflows, and task routing with enterprise-grade security and multi-tenant architecture.
 
-## 🎯 Purpose
+## ✨ Features
 
-AgentHub serves as the **central orchestration hub** for AI automation agents designed in n8n. Rather than being a customer-facing application, it's an internal platform that:
+### 🤖 Agent Registry
+- **CRUD Operations**: Create, read, update, and delete AI agents
+- **Version Management**: Track agent versions with system prompts and parameters
+- **Type Support**: Local AI agents and n8n workflow agents
+- **Parameter Configuration**: JSON-based parameter management with validation
 
-- **Imports & Stores** agents designed in n8n workflows
-- **Provides API access** for other applications to call agents
-- **Manages agent lifecycle** with analytics, monitoring, and control
-- **Enhances agent capabilities** using Supabase vector storage and Langfuse observability
-- **Enables future master agent** coordination and task distribution
+### 🔄 n8n Integration
+- **No-Code Import**: Import n8n workflows via UI with automatic schema detection
+- **Workflow Discovery**: Browse and select workflows from your n8n instance
+- **Credential Management**: Secure storage of n8n authentication credentials
+- **Test & Validate**: Test workflow bindings before deployment
 
-## 🏗️ Core Architecture
+### 🎯 Task Routing
+- **Multi-Destination Support**: Send tasks to webhooks, Supabase functions, or custom APIs
+- **Override Capabilities**: Override system prompts and parameters per execution
+- **HMAC Verification**: Secure communication with shared secrets
+- **Rate Limiting**: Configurable rate limits per destination
 
-### **Agent Flow:**
-```
-n8n Design → AgentHub Import → Vector Storage → API Calls → External Apps
-```
+### 🏗️ Architecture
+- **Multi-Tenant**: Row-level security with Supabase RLS
+- **Feature-Based Structure**: Organized codebase for scalability
+- **Type Safety**: End-to-end TypeScript with generated database types
+- **Theme Consistency**: Matches Ethos Digital website design system
 
-### **Primary Components:**
-- **Agent Storage**: Supabase with pgvector for intelligent agent storage
-- **API Layer**: Express.js providing agent execution endpoints  
-- **Analytics Engine**: Real-time monitoring of agent performance
-- **Vector Intelligence**: Enhanced agent capabilities via embeddings
-- **Master Agent Future**: Central coordinator for multi-agent workflows
+## 🛠️ Tech Stack
 
-## 🤖 Agent Roadmap
+### Frontend
+- **Next.js 14**: React framework with App Router
+- **TypeScript**: Full type safety
+- **Tailwind CSS**: Utility-first CSS with custom design tokens
+- **Lucide React**: Beautiful, customizable icons
 
-### **Phase 1: Foundation Agents (MVP)**
-1. **Conversational Agent** - Customer interaction and qualification
-2. **Appointment Scheduling Agent** - Meeting coordination and booking
-3. **Form-Filling Agent** - Automated client intake based on conversation summaries
-4. **Research Agent** - Client analysis and preparation for consultations
+### Backend
+- **Supabase**: PostgreSQL database with real-time subscriptions
+- **Row-Level Security**: Multi-tenant data isolation
+- **Edge Functions**: Serverless compute for webhooks
 
-### **Phase 2: Production Agents**
-- **Content Creation Agent** - Blog posts, social media, video/images
-- **Analysis Agent** - Business impact reporting for clients
-- **Master Agent** - Intelligent task distribution and coordination
-- **Additional specialized agents** as business needs evolve
+### Development
+- **ESLint**: Code quality and consistency
+- **Prettier**: Code formatting
+- **TypeScript**: Static type checking
 
-## 🛠️ Technology Stack
+## 🚀 Quick Start
 
-### **Core Platform:**
-- **Backend**: Node.js + Express + TypeScript
-- **Frontend**: Next.js 14 + React + TypeScript (Internal team interface)
-- **Database**: Supabase (PostgreSQL + pgvector for embeddings)
-- **Authentication**: Supabase Auth
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Supabase account and project
 
-### **AI & Agent Technologies:**
-- **Workflow Design**: n8n (primary agent development)
-- **Vector Storage**: Supabase pgvector for intelligent agent storage
-- **LLM Observability**: Langfuse for monitoring and optimization
-- **Future Consideration**: LangGraph for advanced agent coordination
-
-### **Integration & Monitoring:**
-- **API Layer**: RESTful endpoints for external application integration
-- **Real-time Updates**: Supabase Realtime for live monitoring
-- **Analytics**: Custom performance tracking and success metrics
-- **Logging**: Pino for structured application logging
-
-## 🎯 Key Features
-
-### **For Internal Team:**
-- 📊 **Agent Performance Dashboard** - Success rates, run counts, status monitoring
-- ⚡ **Agent Control Panel** - Pause/resume, configuration, testing
-- 🔍 **Agent Analytics** - Detailed performance metrics and insights
-- 🧪 **Agent Testing** - Safe environment for agent validation
-
-### **For External Applications:**
-- 🚀 **Agent API** - Programmatic access to deploy agents
-- 📡 **Real-time Callbacks** - Status updates and completion notifications
-- 🔗 **Seamless Integration** - Easy integration with websites and applications
-- ⚖️ **Load Balancing** - Efficient agent distribution and scaling
-
-## 🔄 Integration Points
-
-### **Inbound:**
-- **n8n Workflows** → Import/sync agent definitions
-- **External Apps** → API calls to execute agents
-- **Team Interface** → Manual agent management and monitoring
-
-### **Outbound:**
-- **Supabase** → Data persistence and vector storage
-- **Langfuse** → LLM monitoring and optimization
-- **External APIs** → Agent execution and data collection
-- **Callback URLs** → Status updates to calling applications
-
-## 🚀 Getting Started
-
-### **Prerequisites:**
-- Node.js 20+
-- npm 10+
-- Supabase account with pgvector enabled
-- n8n instance for agent design
-
-### **Quick Start:**
+### 1. Clone and Install
 ```bash
-# Clone and install
 git clone <repository-url>
-cd AgentHub && npm install
+cd AgentHub
+npm install
+```
 
-# Environment health check
-npm run doctor
+### 2. Environment Setup
+```bash
+# Copy environment template
+cp env.template .env.local
 
-# Configure environment
-cp env.template apps/portal/.env.local
-cp env.template services/agent-hub/.env
-# Add your Supabase, n8n, and security credentials
+# Fill in your Supabase credentials
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
 
-# Database setup
-# Run setup-project.sql in Supabase SQL editor
+### 3. Database Setup
+```bash
+# Run the migration in your Supabase dashboard
+# Copy contents of services/agent-hub/src/db/sql/03_agent_registry.sql
+```
 
-# Start development
+### 4. Start Development
+```bash
 npm run dev
 ```
 
-**Endpoints:**
-- **Internal Dashboard**: http://localhost:3001 (Team access only)
-- **Agent API**: http://localhost:5000 (External application access)
-
-## 🚢 Deploy Playbook
-
-### **Environment Variables**
-
-| Variable | Frontend | Backend | Required | Description |
-|----------|----------|---------|----------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | ✅ | ✅ | ✅ | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | ✅ | ✅ | Supabase anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | ❌ | ✅ | ✅ | Service role key (server-only) |
-| `HMAC_WEBHOOK_SECRET` | ❌ | ✅ | ✅ | 32+ char webhook secret |
-| `N8N_BASE_URL` | ❌ | ✅ | ⚠️ | n8n instance URL |
-| `DEFAULT_TENANT_ID` | ❌ | ✅ | ⚠️ | Default org UUID |
-
-### **Pre-Deploy Checklist**
-
-```bash
-# 1. Environment validation
-npm run doctor
-
-# 2. Type checking
-npm run typecheck
-
-# 3. Build verification
-npm run build
-
-# 4. Security check
-grep -r "SUPABASE_SERVICE_ROLE_KEY" apps/portal/src/ || echo "✅ No service key in client"
-```
-
-### **Deployment Steps**
-
-1. **Database Migration**
-   - Run `setup-project.sql` in Supabase
-   - Verify RLS policies are active
-   - Test with limited user account
-
-2. **Environment Setup**
-   - Set all required environment variables
-   - Generate secure `HMAC_WEBHOOK_SECRET` (32+ chars)
-   - Verify CORS domains match your deployment URLs
-
-3. **Deploy & Monitor**
-   - Deploy backend service first
-   - Test health endpoints: `/api/health` and `/api/v1/health`
-   - Deploy frontend
-   - Monitor error rates for first 24h
-
-### **Rollback Procedure**
-
-```bash
-# 1. Identify last working version
-git log --oneline -10
-
-# 2. Revert deployment
-git checkout <last-working-commit>
-
-# 3. Redeploy
-npm run build && deploy
-```
+Visit `http://localhost:3001` to see the application.
 
 ## 📁 Project Structure
 
 ```
 AgentHub/
-├── apps/portal/              # Internal team dashboard (Next.js)
-├── services/agent-hub/       # Agent API and orchestration (Express)
-├── packages/shared/          # Common types and utilities
-└── docs/                     # Architecture and integration docs
+├── apps/
+│   └── portal/                 # Next.js frontend application
+│       ├── src/
+│       │   ├── app/            # App Router pages
+│       │   ├── components/     # Reusable UI components
+│       │   ├── features/       # Feature-based organization
+│       │   │   ├── agents/     # Agent management
+│       │   │   ├── n8n/        # n8n integration
+│       │   │   └── destinations/ # Task routing
+│       │   ├── lib/            # Utilities and configurations
+│       │   └── config/         # Environment and app config
+│       └── public/             # Static assets
+├── services/
+│   └── agent-hub/             # Backend services
+│       ├── src/
+│       │   ├── db/            # Database schema and types
+│       │   ├── routes/        # API endpoints
+│       │   └── lib/           # Backend utilities
+│       └── package.json
+└── packages/
+    └── shared/                # Shared types and utilities
 ```
 
-## 🎯 Usage Scenarios
+## 🔧 Development Commands
 
-### **Typical Workflow:**
-1. **Design agent** in n8n with specific business logic
-2. **Import/sync** agent definition to AgentHub
-3. **Test agent** using internal dashboard
-4. **Deploy agent** via API to customer websites/applications
-5. **Monitor performance** and optimize based on analytics
+```bash
+# Development
+npm run dev              # Start development server
+npm run dev:check        # Lint + type check
+npm run build           # Build for production
+npm run start           # Start production server
 
-### **API Integration Example:**
-```javascript
-// External app calls AgentHub
-const response = await fetch('http://agenthub-api/agents/conversational/run', {
-  method: 'POST',
-  body: JSON.stringify({ 
-    context: customerData,
-    callback_url: 'https://myapp.com/agent-complete'
-  })
-});
+# Database
+npm run db:migrate      # Run database migrations
+npm run db:reset        # Reset database (Supabase dashboard)
+
+# Code Quality
+npm run lint            # ESLint check
+npm run typecheck       # TypeScript check
+npm run clean           # Clean build artifacts
 ```
 
-## 🔮 Future Vision
+## 🎨 Design System
 
-- **Master Agent Coordination**: Single interface to orchestrate multiple specialized agents
-- **Automatic Integration**: Master agent can automatically deploy agents to customer systems
-- **Advanced Analytics**: Predictive insights and optimization recommendations
-- **Scalable Infrastructure**: Multi-tenant support for different client environments
+Agent Hub uses a consistent design system that matches the Ethos Digital website:
+
+- **Colors**: Dark theme with cyan accents (#22d3ee)
+- **Typography**: Inter font family with clear hierarchy
+- **Components**: Consistent card layouts, buttons, and form elements
+- **Animations**: Smooth transitions and micro-interactions
+
+### Design Tokens
+```typescript
+// Available in src/lib/design-tokens.ts
+import { designTokens } from '@/lib/design-tokens';
+
+// Colors, spacing, typography, and more
+console.log(designTokens.colors.primary[400]); // #22d3ee
+```
+
+## 🔐 Security Features
+
+### Multi-Tenant Architecture
+- **Row-Level Security**: Data isolation between tenants
+- **JWT Authentication**: Secure user authentication
+- **Role-Based Access**: Admin vs. member permissions
+
+### Credential Management
+- **Encrypted Storage**: AES-256-GCM encryption for sensitive data
+- **Secure APIs**: HMAC verification for webhook communications
+- **Environment Variables**: Secure configuration management
+
+## 📊 Database Schema
+
+### Core Tables
+- **agents**: Agent definitions and metadata
+- **agent_versions**: Versioned agent configurations
+- **agent_bindings**: n8n workflow bindings
+- **destinations**: External API endpoints
+- **agent_executions**: Execution history and audit logs
+
+### Relationships
+```
+agents (1) ←→ (many) agent_versions
+agents (1) ←→ (many) agent_bindings
+agents (1) ←→ (many) agent_executions
+destinations (1) ←→ (many) agent_executions
+```
+
+## 🔌 API Endpoints
+
+### Agent Management
+```http
+GET    /api/v1/agents          # List agents
+POST   /api/v1/agents          # Create agent
+GET    /api/v1/agents/:id      # Get agent details
+PUT    /api/v1/agents/:id      # Update agent
+DELETE /api/v1/agents/:id      # Delete agent
+```
+
+### Agent Execution
+```http
+POST   /api/v1/agents/:id/invoke     # Execute agent locally
+POST   /api/v1/agents/:id/send       # Send to destination
+GET    /api/v1/executions/:id        # Get execution details
+```
+
+### n8n Integration
+```http
+POST   /api/v1/n8n/discover          # Discover workflows
+POST   /api/v1/n8n/import            # Import workflow
+POST   /api/v1/n8n/test              # Test workflow binding
+```
+
+## 🧪 Testing
+
+### Current Status
+- **Unit Tests**: Not yet implemented
+- **Integration Tests**: Not yet implemented
+- **E2E Tests**: Not yet implemented
+
+### Planned Testing Strategy
+```bash
+# Unit tests with Jest
+npm run test:unit
+
+# Integration tests
+npm run test:integration
+
+# E2E tests with Playwright
+npm run test:e2e
+
+# Test coverage
+npm run test:coverage
+```
+
+## 🚀 Deployment
+
+### Production Build
+```bash
+npm run build
+npm run start
+```
+
+### Environment Variables
+```bash
+# Required for production
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+JWT_SECRET=
+ENCRYPTION_KEY=
+
+# Optional
+N8N_DEFAULT_URL=
+NODE_ENV=production
+```
+
+### Deployment Platforms
+- **Vercel**: Recommended for Next.js apps
+- **Railway**: Full-stack with database
+- **Render**: Full-stack with PostgreSQL
+- **Netlify**: Frontend only (requires separate backend)
+
+## 🤝 Contributing
+
+### Development Workflow
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
+
+### Code Standards
+- **TypeScript**: Strict mode enabled
+- **ESLint**: Airbnb configuration
+- **Prettier**: Consistent formatting
+- **Conventional Commits**: Standard commit message format
+
+## 📚 Documentation
+
+### Additional Resources
+- [Architecture Guide](./ARCHITECTURE.md)
+- [Environment Setup](./ENVIRONMENT_GUIDE.md)
+- [Supabase Integration](./SUPABASE_INTEGRATION.md)
+- [n8n Webhook Setup](./N8N_WEBHOOK_SETUP.md)
+- [Production Readiness](./ETHOS_WEBSITE_PRODUCTION_GUIDE.md)
+
+### API Documentation
+- [OpenAPI Spec](./docs/api/openapi.yaml)
+- [Postman Collection](./docs/api/postman.json)
+
+## 📄 License
+
+This project is proprietary and confidential. All rights reserved.
+
+## 🆘 Support
+
+### Getting Help
+- **Documentation**: Check the docs folder
+- **Issues**: Create a GitHub issue
+- **Discussions**: Use GitHub Discussions for questions
+
+### Common Issues
+- **Database Connection**: Verify Supabase credentials
+- **Build Errors**: Check Node.js version and dependencies
+- **Type Errors**: Run `npm run typecheck` for details
 
 ---
 
-**Note**: This is an internal platform designed for team use and external API integration. Customer-facing interfaces will be separate applications that call AgentHub's services.
-
-## License
-
-Private - Ethos Horizon's Internal Use
+Built with ❤️ by the Ethos Digital team

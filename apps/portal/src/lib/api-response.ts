@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-// Standard API response types
+// Standard API response types - use shared package for consistency
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
@@ -10,7 +10,7 @@ export interface ApiResponse<T = any> {
   requestId?: string;
 }
 
-// Response helper functions
+// Next.js-specific response helpers only
 export function ok<T>(data: T, message?: string): NextResponse<ApiResponse<T>> {
   return NextResponse.json({
     success: true,

@@ -13,7 +13,10 @@ import {
   Zap,
   TrendingUp,
   LogOut,
-  User
+  User,
+  Globe,
+  Workflow,
+  GitBranch
 } from 'lucide-react'
 import { useAuth } from '@/components/auth/AuthProvider'
 
@@ -27,6 +30,8 @@ interface NavItem {
 const navItems: NavItem[] = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/agents', label: 'Agents', icon: Bot, badge: '4' },
+  { href: '/agents/import/n8n', label: 'Import n8n', icon: Workflow },
+  { href: '/destinations', label: 'Destinations', icon: Globe },
   { href: '/runs', label: 'Runs', icon: Play },
   { href: '/analytics', label: 'Analytics', icon: TrendingUp },
   { href: '/api-logs', label: 'API Logs', icon: Database },

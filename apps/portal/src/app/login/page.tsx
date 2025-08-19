@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { LogIn, Shield, Zap } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +29,7 @@ export default function LoginPage() {
       }
     } catch (err) {
       setError('An unexpected error occurred');
-      console.error('Login error:', err);
+      logger.error('Login error', { error: err });
     } finally {
       setIsLoading(false);
     }

@@ -9,7 +9,12 @@
     "start": "next start -p 3001",
     "lint": "next lint",
     "clean": "rimraf .next",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "dev:check": "npm run lint && npm run typecheck",
+    "test": "echo \"Tests not yet implemented\"",
+    "test:watch": "echo \"Tests not yet implemented\"",
+    "db:migrate": "echo \"Run migrations in services/agent-hub/src/db/sql/\"",
+    "db:reset": "echo \"Reset database - run in Supabase dashboard\""
   },
   "dependencies": {
     "@agent-hub/shared": "*",

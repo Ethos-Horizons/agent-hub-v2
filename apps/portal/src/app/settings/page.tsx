@@ -18,6 +18,7 @@ import {
   Zap
 } from 'lucide-react'
 import { useAuth } from '@/components/auth/AuthProvider'
+import { logger } from '@/lib/logger';
 
 interface SettingsSection {
   id: string
@@ -125,20 +126,60 @@ export default function SettingsPage() {
     navigator.clipboard.writeText(text)
   }
 
-  const handleSave = () => {
-    // Simulate save
-    console.log('Saving settings:', settings)
-  }
+  const handleSaveSettings = async () => {
+    try {
+      setSaving(true);
+      logger.info('Saving settings', { settings });
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (error) {
+      logger.error('Failed to save settings', { error });
+      setError('Failed to save settings');
+    } finally {
+      setSaving(false);
+    }
+  };
 
-  const generateNewKey = (service: string) => {
-    console.log('Generating new key for:', service)
-    // Implement key generation
-  }
+  const handleGenerateKey = async (service: string) => {
+    try {
+      setGenerating(service);
+      logger.info('Generating new key for service', { service });
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setApiKeys(prev => ({
+        ...prev,
+        [service]: `sk-${Math.random().toString(36).substring(2)}${Date.now().toString(36)}`
+      }));
+    } catch (error) {
+      logger.error('Failed to generate API key', { service, error });
+      setError('Failed to generate API key');
+    } finally {
+      setGenerating(null);
+    }
+  };
 
-  const testConnection = (service: string) => {
-    console.log('Testing connection for:', service)
-    // Implement connection test
-  }
+  const handleTestConnection = async (service: string) => {
+    try {
+      setTesting(service);
+      logger.info('Testing connection for service', { service });
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setConnections(prev => ({
+        ...prev,
+        [service]: { status: 'connected', lastTested: new Date().toISOString() }
+      }));
+    } catch (error) {
+      logger.error('Connection test failed', { service, error });
+      setConnections(prev => ({
+        ...prev,
+        [service]: { status: 'failed', lastTested: new Date().toISOString() }
+      }));
+    } finally {
+      setTesting(null);
+    }
+  };
 
   const renderGeneralSettings = () => (
     <div className="space-y-6">
@@ -230,7 +271,7 @@ export default function SettingsPage() {
               </div>
             </div>
             <button
-              onClick={() => testConnection('supabase')}
+              onClick={() => handleTestConnection('supabase')}
               className="px-3 py-1 bg-zinc-700 text-white rounded text-sm hover:bg-zinc-600"
             >
               Test Connection
@@ -274,13 +315,13 @@ export default function SettingsPage() {
             </div>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => generateNewKey(service)}
+                onClick={() => handleGenerateKey(service)}
                 className="px-3 py-1 bg-zinc-700 text-white rounded text-sm hover:bg-zinc-600"
               >
                 <RefreshCw className="h-4 w-4" />
               </button>
               <button
-                onClick={() => testConnection(service)}
+                onClick={() => handleTestConnection(service)}
                 className="px-3 py-1 bg-cyan-400 text-black rounded text-sm hover:bg-cyan-300"
               >
                 Test
@@ -428,7 +469,7 @@ export default function SettingsPage() {
           <p className="text-zinc-400">Configure your AgentHub platform preferences</p>
         </div>
         <button
-          onClick={handleSave}
+          onClick={handleSaveSettings}
           className="flex items-center gap-2 px-4 py-2 bg-cyan-400 text-black rounded-lg hover:bg-cyan-300 transition-colors font-medium"
         >
           <Save className="h-4 w-4" />

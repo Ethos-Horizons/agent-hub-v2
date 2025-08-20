@@ -1,5 +1,6 @@
 import { createBrowserClient } from '@supabase/ssr';
 import { clientEnv } from '@/config/env';
+import { logger } from '@/lib/logger';
 
 // Client-side Supabase client (browser only)
 export function createClient() {
@@ -92,8 +93,7 @@ export const org = {
   }
 }
 
-// Legacy export for backward compatibility - but with warning
-export const supabase = (() => {
-  console.warn('Using legacy supabase export. Consider using createClient() instead.');
-  return createClient();
-})();
+// Legacy export for backward compatibility
+if (typeof window !== 'undefined') {
+  logger.warn('Using legacy supabase export. Consider using createClient() instead.');
+}

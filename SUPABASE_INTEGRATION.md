@@ -1,165 +1,111 @@
-# AgentHub + Supabase Multi-Tenant Integration
+# Supabase Integration Guide
 
-## 🎯 Overview
-AgentHub has been fully updated to integrate with your comprehensive Supabase multi-tenant database structure. This provides robust authentication, organization management, and conversation handling with proper tenant isolation.
+## Overview
 
-## ✅ **What's Been Updated**
+This guide covers integrating Agent Hub with Supabase for authentication, database, and real-time features.
 
-### **1. Database Schema Integration**
-- ✅ Updated all types in `packages/shared/src/index.ts` to match your Supabase schema
-- ✅ Added support for multi-tenant `organizations`, `org_members`, `profiles`
-- ✅ Updated `conversations`, `messages`, `agents` with proper `tenant_id` isolation
-- ✅ Added `ApiKey` type for API authentication
+## Database Setup
 
-### **2. Backend API Updates**
-- ✅ Enhanced `services/agent-hub/src/lib/supabase.ts` with tenant management helpers
-- ✅ Updated conversation routes to use new `conversations` and `messages` tables
-- ✅ Added proper tenant validation and access control
-- ✅ Integrated with your existing Edge Function for message processing
+### 1. Create Supabase Project
+- Go to [supabase.com](https://supabase.com)
+- Create a new project
+- Note your project URL and API keys
 
-### **3. Frontend Authentication**
-- ✅ Updated `apps/portal/src/lib/supabase.ts` with full Supabase Auth integration
-- ✅ Added organization management helpers
-- ✅ Prepared for multi-tenant context in the UI
+### 2. Run Migrations
+Execute the SQL migrations in order:
+```sql
+-- Run these in your Supabase SQL Editor
+-- 1. Initial tables (already exists)
+-- 2. RLS policies (already exists)  
+-- 3. Agent registry tables (new)
+-- Copy contents of: services/agent-hub/src/db/sql/03_agent_registry.sql
+```
 
-## 🔧 **Environment Variables Needed**
-
-Update your `.env` files with these variables:
-
-```env
-# Supabase Configuration (Required)
-SUPABASE_URL=https://your-project-reference.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+### 3. Environment Variables
+```bash
+# .env.local
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-
-# n8n Configuration (Required)  
-N8N_BASE=https://your-instance.app.n8n.cloud
-
-# Organization Configuration (Required)
-DEFAULT_TENANT_ID=your-organization-uuid-from-supabase
-
-# Optional
-OPENAI_API_KEY=your-openai-api-key
-API_BASE_URL=http://localhost:5000
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
-## 🚀 **Next Steps for You**
+## Authentication
 
-### **1. Get Your Environment Variables**
+### 1. Enable Auth Providers
+In Supabase Dashboard > Authentication > Providers:
+- **Email**: Enable
+- **Google**: Configure OAuth credentials
+- **GitHub**: Optional
 
-#### **Find N8N_BASE:**
-- **n8n Cloud**: Go to n8n.cloud → Your instance URL
-- **Local n8n**: Usually `http://localhost:5678`
+### 2. Configure RLS Policies
+The migration automatically creates RLS policies for:
+- **agent_versions**: Users can manage versions of their agents
+- **agent_bindings**: Users can manage n8n bindings for their agents
+- **destinations**: Users can manage their own destinations
+- **agent_executions**: Service role can manage executions
 
-#### **Get DEFAULT_TENANT_ID:**
-1. Go to Supabase Dashboard → SQL Editor
-2. Run the updated `setup-project.sql` file (creates tables + organization)
-3. Copy the organization ID returned
+## n8n Cloud Integration
 
-#### **Get Supabase Keys:**
-- Go to Supabase Dashboard → Settings → API
-- Copy URL, anon key, and service role key
+### 1. n8n Cloud Setup
+- **URL**: Your n8n.cloud instance (e.g., `https://cmchorizions.app.n8n.cloud`)
+- **API Key**: Required for workflow management (enterprise plan)
+- **Webhooks**: Available in all plans
 
-### **2. Database Setup**
-Run the `setup-project.sql` file in your Supabase SQL Editor to:
-- ✅ Create all required tables
-- ✅ Set up your organization  
-- ✅ Enable vector extension for embeddings
-- ✅ Create proper indexes
-
-### **3. Test the Integration**
-1. **Start AgentHub**: `npm run dev`
-2. **Check connection**: API should connect to your Supabase database
-3. **Test conversation endpoint**: Use the updated `/conversation` API
-4. **Verify in dashboard**: Check conversations appear in Supabase
-
-## 🔄 **Updated API Flow**
-
-### **New Conversation Flow:**
-```
-Website → AgentHub → Supabase → n8n → Supabase → Website
-     ↓         ↓         ↓       ↓        ↓         ↓
-  Send msg   Store     Create   Process  Store    Return
-            conv &    message   with AI  response response
-            message
+### 2. Environment Variables
+```bash
+N8N_BASE_URL=https://your-instance.app.n8n.cloud
+N8N_API_KEY=your_n8n_api_key
 ```
 
-### **Key API Changes:**
-- **Endpoint**: Still `POST /conversation` but now uses new database schema
-- **Tenant isolation**: All data properly isolated by organization
-- **Conversation persistence**: Full conversation history stored in Supabase
-- **Memory context**: Retrieves previous messages for context
+## Real-time Features
 
-## 🛡️ **Security & Multi-Tenancy**
+### 1. Enable Realtime
+In Supabase Dashboard > Database > Replication:
+- Enable realtime for tables you want to sync
 
-### **Row Level Security (RLS)**
-Your database already has RLS policies that:
-- ✅ Isolate data by `tenant_id`
-- ✅ Allow authenticated users access to their org data
-- ✅ Enable anonymous access for public chat widgets
+### 2. Subscribe to Changes
+```typescript
+import { createClient } from '@/lib/supabase/client';
 
-### **Authentication Flow**
-- ✅ Users authenticate via Supabase Auth
-- ✅ Profile created automatically via trigger
-- ✅ Organization membership controls access
-- ✅ JWT contains user context for API calls
+const supabase = createClient();
 
-## 🎛️ **Business Partner Integration**
-
-### **For Your Partner:**
-1. **Simple UI**: AgentHub dashboard provides visual agent management
-2. **No coding required**: Can create/manage agents via the interface
-3. **Real-time monitoring**: See conversations and agent performance
-4. **Organization access**: Both of you can access same tenant data
-
-### **Role-Based Access:**
-- **Owner**: Full access to organization (you)
-- **Admin**: Can manage agents and view analytics (your partner)
-- **Member**: Limited access to specific features
-
-## 🔮 **Ready for Production**
-
-### **Deployment Architecture:**
-```
-Domain Setup:
-├── yourdomain.com (Main website)
-├── agenthub.yourdomain.com (AgentHub dashboard)
-└── api.yourdomain.com (AgentHub API)
+// Subscribe to agent executions
+const subscription = supabase
+  .channel('agent_executions')
+  .on('postgres_changes', 
+    { event: '*', schema: 'public', table: 'agent_executions' },
+    (payload) => {
+      console.log('Execution updated:', payload);
+    }
+  )
+  .subscribe();
 ```
 
-### **Vercel Deployment:**
-1. **AgentHub Dashboard**: Deploy `apps/portal` to Vercel
-2. **AgentHub API**: Deploy `services/agent-hub` to Vercel/Railway
-3. **Environment variables**: Set all required vars in deployment
+## Testing
 
-## 🧪 **Testing Checklist**
+### 1. Database Connection
+```bash
+npm run dev
+# Navigate to /agents to see existing agents
+# Navigate to /agents/import/n8n to test import flow
+```
 
-### **Before First Agent:**
-- [ ] Database tables created via `setup-project.sql`
-- [ ] Environment variables set correctly
-- [ ] AgentHub connects to Supabase successfully
-- [ ] n8n webhook URL accessible from AgentHub
+### 2. Authentication Flow
+```bash
+# Test login/logout
+# Test protected routes
+# Test user-specific data access
+```
 
-### **With First Agent:**
-- [ ] n8n workflow receives calls from AgentHub
-- [ ] Conversations stored in Supabase properly
-- [ ] Messages have proper tenant isolation
-- [ ] Callback from n8n updates conversation
+## Troubleshooting
 
-### **Website Integration:**
-- [ ] Website calls AgentHub instead of n8n directly
-- [ ] Session management works across refreshes
-- [ ] Conversation history persists
-- [ ] Anonymous users can chat via widget
+### Common Issues
+1. **RLS Policy Errors**: Check if policies exist in Supabase Dashboard
+2. **Authentication Failures**: Verify OAuth configuration
+3. **Database Connection**: Check environment variables
 
-## 📞 **Support for Implementation**
-
-The integration is now complete and follows all the patterns from your Supabase AI's recommendations. Key benefits:
-
-- **✅ Proper multi-tenancy** with organization isolation
-- **✅ Full conversation persistence** with vector embeddings
-- **✅ Authentication & RBAC** for team collaboration  
-- **✅ Scalable architecture** ready for multiple agents
-- **✅ Public widget support** for anonymous conversations
-
-Once you get your environment variables set up and run the database setup, you'll be ready to create your first conversational agent in n8n and test the full integration! 🚀
+### Debug Steps
+1. Check Supabase logs
+2. Verify RLS policies
+3. Test with service role key
+4. Check browser console for errors

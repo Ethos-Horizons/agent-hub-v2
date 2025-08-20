@@ -1,6 +1,8 @@
 // Centralized secrets management for Agent Hub
 // This module handles secure access to sensitive configuration and credentials
 
+import { logger } from '@/lib/logger';
+
 export interface SecretConfig {
   name: string;
   value: string;
@@ -10,20 +12,38 @@ export interface SecretConfig {
 }
 
 export interface EncryptedSecret {
-  encrypted_value: string;
-  encryption_key_id: string;
-  algorithm: 'AES-256-GCM' | 'ChaCha20-Poly1305';
-  nonce: string;
-  tag: string;
+  value: string;
+  iv: Uint8Array;
 }
 
 class SecretsManager {
   private static instance: SecretsManager;
-  private secrets: Map<string, SecretConfig> = new Map();
+  private secrets = new Map<string, SecretConfig>();
   private encryptionKey: CryptoKey | null = null;
 
   private constructor() {
-    this.initializeSecrets();
+    // Load initial secrets from environment or secure storage
+    const envSecrets = {
+      SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+      ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+      HMAC_WEBHOOK_SECRET: process.env.HMAC_WEBHOOK_SECRET,
+      ENCRYPTION_KEY: process.env.ENCRYPTION_KEY, // Base64 encoded key
+    };
+
+    for (const [key, value] of Object.entries(envSecrets)) {
+      if (value) {
+        this.secrets.set(key, {
+          name: key,
+          value: value,
+          encrypted: false, // Environment variables are not encrypted by this manager
+          last_updated: new Date().toISOString(),
+          access_level: key.includes('SERVICE_ROLE') || key.includes('HMAC') ? 'service' : 'public',
+        });
+      }
+    }
   }
 
   public static getInstance(): SecretsManager {
@@ -33,55 +53,32 @@ class SecretsManager {
     return SecretsManager.instance;
   }
 
-  private async initializeSecrets() {
-    // Load secrets from environment variables and secure storage
-    const envSecrets: Record<string, string> = {
-      SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-      SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
-      N8N_DEFAULT_URL: process.env.N8N_DEFAULT_URL || '',
-      JWT_SECRET: process.env.JWT_SECRET || '',
-      ENCRYPTION_KEY: process.env.ENCRYPTION_KEY || '',
-    };
-
-    // Store public secrets (client-side accessible)
-    Object.entries(envSecrets).forEach(([key, value]) => {
-      if (value) {
-        this.secrets.set(key, {
-          name: key,
-          value,
-          encrypted: false,
-          last_updated: new Date().toISOString(),
-          access_level: key.startsWith('NEXT_PUBLIC_') ? 'public' : 'service',
-        });
-      }
-    });
-
-    // Initialize encryption if key is available
-    if (envSecrets.ENCRYPTION_KEY) {
-      await this.initializeEncryption(envSecrets.ENCRYPTION_KEY);
-    }
-  }
-
-  private async initializeEncryption(keyMaterial: string) {
+  private async initializeEncryption(): Promise<void> {
     try {
-      // Convert base64 key to CryptoKey
-      const keyData = Uint8Array.from(atob(keyMaterial), c => c.charCodeAt(0));
-      this.encryptionKey = await crypto.subtle.importKey(
-        'raw',
-        keyData,
-        { name: 'AES-GCM' },
-        false,
-        ['encrypt', 'decrypt']
-      );
+      // Generate a new encryption key if none exists
+      if (!this.encryptionKey) {
+        const key = await crypto.subtle.generateKey(
+          {
+            name: 'AES-GCM',
+            length: 256,
+          },
+          true,
+          ['encrypt', 'decrypt']
+        );
+
+        // Store the key in memory (in production, consider more secure storage)
+        this.encryptionKey = key;
+        logger.info('Encryption key generated successfully');
+      }
     } catch (error) {
-      console.warn('Failed to initialize encryption:', error);
+      logger.warn('Failed to initialize encryption', { error });
+      // Fallback to plaintext storage (not recommended for production)
     }
   }
 
   public getSecret(name: string, accessLevel: 'public' | 'user' | 'admin' | 'service' = 'public'): string | null {
     const secret = this.secrets.get(name);
-    
+
     if (!secret) {
       return null;
     }
@@ -94,198 +91,162 @@ class SecretsManager {
     return null;
   }
 
-  public async setSecret(name: string, value: string, accessLevel: 'public' | 'user' | 'admin' | 'service' = 'user'): Promise<void> {
-    let encryptedValue = value;
-    let encrypted = false;
+  async setSecret(name: string, value: string, accessLevel: 'public' | 'user' | 'admin' | 'service' = 'user'): Promise<void> {
+    try {
+      await this.initializeEncryption();
 
-    // Encrypt sensitive secrets
-    if (accessLevel !== 'public' && this.encryptionKey) {
-      try {
-        encryptedValue = await this.encryptValue(value);
-        encrypted = true;
-      } catch (error) {
-        console.warn('Failed to encrypt secret, storing as plaintext:', error);
+      let encryptedValue: string;
+      if (this.encryptionKey) {
+        // Encrypt the value
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const encodedValue = new TextEncoder().encode(value);
+
+        const encrypted = await crypto.subtle.encrypt(
+          {
+            name: 'AES-GCM',
+            iv,
+          },
+          this.encryptionKey,
+          encodedValue
+        );
+
+        // Combine IV and encrypted data
+        const combined = new Uint8Array(iv.length + encrypted.byteLength);
+        combined.set(iv);
+        combined.set(new Uint8Array(encrypted));
+
+        encryptedValue = btoa(String.fromCharCode(...combined));
+      } else {
+        // Fallback to plaintext (not recommended)
+        encryptedValue = value;
       }
+
+      this.secrets.set(name, {
+        name,
+        value: encryptedValue,
+        encrypted: !!this.encryptionKey,
+        last_updated: new Date().toISOString(),
+        access_level: accessLevel,
+      });
+
+      logger.info('Secret stored successfully', { key: name, access: accessLevel, encrypted: !!this.encryptionKey });
+    } catch (error) {
+      logger.warn('Failed to encrypt secret, storing as plaintext', { key: name, error });
+      // Store as plaintext as last resort
+      this.secrets.set(name, {
+        name,
+        value,
+        encrypted: false,
+        last_updated: new Date().toISOString(),
+        access_level: accessLevel,
+      });
     }
-
-    this.secrets.set(name, {
-      name,
-      value: encryptedValue,
-      encrypted,
-      last_updated: new Date().toISOString(),
-      access_level: accessLevel,
-    });
-
-    // Persist to secure storage (implementation depends on platform)
-    await this.persistSecret(name, encryptedValue, accessLevel);
   }
 
   public async getEncryptedSecret(name: string): Promise<string | null> {
     const secret = this.secrets.get(name);
-    
     if (!secret || !secret.encrypted) {
-      return null;
-    }
-
-    if (!this.encryptionKey) {
-      throw new Error('Encryption not initialized');
+      return secret ? secret.value : null;
     }
 
     try {
+      await this.initializeEncryption();
+      if (!this.encryptionKey) {
+        logger.error('Encryption key not initialized for decryption', { key: name });
+        return null;
+      }
       return await this.decryptValue(secret.value);
     } catch (error) {
-      console.error('Failed to decrypt secret:', error);
+      logger.error('Failed to decrypt secret', { key: name, error });
       return null;
     }
   }
 
   private async encryptValue(value: string): Promise<string> {
     if (!this.encryptionKey) {
-      throw new Error('Encryption not initialized');
+      throw new Error('Encryption key not available');
     }
-
-    const encoder = new TextEncoder();
-    const data = encoder.encode(value);
-    const nonce = crypto.getRandomValues(new Uint8Array(12));
-
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encoded = new TextEncoder().encode(value);
     const encrypted = await crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv: nonce },
+      {
+        name: 'AES-GCM',
+        iv: iv,
+      },
       this.encryptionKey,
-      data
+      encoded
     );
-
-    // Combine nonce and encrypted data
-    const result = new Uint8Array(nonce.length + encrypted.byteLength);
-    result.set(nonce);
-    result.set(new Uint8Array(encrypted), nonce.length);
-
-    return btoa(String.fromCharCode(...result));
+    const combined = new Uint8Array(iv.length + encrypted.byteLength);
+    combined.set(iv);
+    combined.set(new Uint8Array(encrypted), iv.length);
+    return btoa(String.fromCharCode(...combined));
   }
 
   private async decryptValue(encryptedValue: string): Promise<string> {
     if (!this.encryptionKey) {
-      throw new Error('Encryption not initialized');
+      throw new Error('Encryption key not available for decryption');
     }
-
-    const data = Uint8Array.from(atob(encryptedValue), c => c.charCodeAt(0));
-    const nonce = data.slice(0, 12);
-    const encrypted = data.slice(12);
+    const combined = Uint8Array.from(atob(encryptedValue), c => c.charCodeAt(0));
+    const iv = combined.slice(0, 12);
+    const encrypted = combined.slice(12);
 
     const decrypted = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: nonce },
+      {
+        name: 'AES-GCM',
+        iv: iv,
+      },
       this.encryptionKey,
       encrypted
     );
-
-    const decoder = new TextDecoder();
-    return decoder.decode(decrypted);
+    return new TextDecoder().decode(decrypted);
   }
 
-  private hasAccess(secretLevel: string, requestedLevel: string): boolean {
-    const levels = ['public', 'user', 'admin', 'service'];
-    const secretIndex = levels.indexOf(secretLevel);
-    const requestedIndex = levels.indexOf(requestedLevel);
-    
-    return requestedIndex >= secretIndex;
-  }
-
-  private async persistSecret(name: string, value: string, accessLevel: string): Promise<void> {
-    // Implementation depends on the platform:
-    // - Browser: localStorage/sessionStorage for public, IndexedDB for private
-    // - Node.js: Environment variables or secure key management
-    // - Supabase: Encrypted storage in database
-    
-    if (typeof window !== 'undefined') {
-      // Browser environment
-      if (accessLevel === 'public') {
-        localStorage.setItem(`secret_${name}`, value);
-      } else {
-        // For private secrets, use a more secure storage method
-        // This is a simplified example - in production, use proper secure storage
-        sessionStorage.setItem(`secret_${name}`, value);
-      }
-    }
-  }
-
-  public listSecrets(accessLevel: 'public' | 'user' | 'admin' | 'service' = 'public'): string[] {
-    const accessibleSecrets: string[] = [];
-    
-    for (const [name, secret] of this.secrets.entries()) {
-      if (this.hasAccess(secret.access_level, accessLevel)) {
-        accessibleSecrets.push(name);
-      }
-    }
-    
-    return accessibleSecrets;
-  }
-
-  public removeSecret(name: string): boolean {
-    const removed = this.secrets.delete(name);
-    
-    if (removed && typeof window !== 'undefined') {
-      localStorage.removeItem(`secret_${name}`);
-      sessionStorage.removeItem(`secret_${name}`);
-    }
-    
-    return removed;
-  }
-
-  public getSecretMetadata(name: string): Omit<SecretConfig, 'value'> | null {
-    const secret = this.secrets.get(name);
-    
-    if (!secret) {
-      return null;
-    }
-    
-    return {
-      name: secret.name,
-      encrypted: secret.encrypted,
-      last_updated: secret.last_updated,
-      access_level: secret.access_level,
+  private hasAccess(secretLevel: 'public' | 'user' | 'admin' | 'service', requestedLevel: 'public' | 'user' | 'admin' | 'service'): boolean {
+    const levels = {
+      'public': 0,
+      'user': 1,
+      'admin': 2,
+      'service': 3,
     };
+    return levels[secretLevel] >= levels[requestedLevel];
   }
 }
 
-// Export singleton instance
 export const secretsManager = SecretsManager.getInstance();
 
 // Convenience functions for common secrets
 export const getSupabaseUrl = () => secretsManager.getSecret('SUPABASE_URL');
 export const getSupabaseAnonKey = () => secretsManager.getSecret('SUPABASE_ANON_KEY');
-export const getSupabaseServiceKey = () => secretsManager.getSecret('SUPABASE_SERVICE_ROLE_KEY', 'service');
-export const getN8nDefaultUrl = () => secretsManager.getSecret('N8N_DEFAULT_URL');
-export const getJwtSecret = () => secretsManager.getSecret('JWT_SECRET', 'service');
+export const getSupabaseServiceRoleKey = () => secretsManager.getSecret('SUPABASE_SERVICE_ROLE_KEY', 'service');
+export const getOpenAiApiKey = () => secretsManager.getSecret('OPENAI_API_KEY', 'admin');
+export const getAnthropicApiKey = () => secretsManager.getSecret('ANTHROPIC_API_KEY', 'admin');
+export const getHmacWebhookSecret = () => secretsManager.getSecret('HMAC_WEBHOOK_SECRET', 'service');
 
-// Secure credential storage for n8n connections
-export interface N8nCredentials {
-  base_url: string;
-  auth_type: 'apiKey' | 'basic' | 'oauth';
-  credentials: Record<string, string>;
+// AI Model Configuration
+export interface AIModelConfig {
+  openai?: string;
+  anthropic?: string;
+  custom?: string;
 }
 
-export const storeN8nCredentials = async (name: string, credentials: N8nCredentials): Promise<void> => {
-  const secretName = `n8n_${name}`;
-  const value = JSON.stringify(credentials);
-  await secretsManager.setSecret(secretName, value, 'user');
-};
-
-export const getN8nCredentials = async (name: string): Promise<N8nCredentials | null> => {
-  const secretName = `n8n_${name}`;
-  const value = await secretsManager.getEncryptedSecret(secretName);
-  
-  if (!value) {
-    return null;
-  }
-  
+export async function storeAIModelCredentials(name: string, config: AIModelConfig): Promise<void> {
   try {
+    const configJson = JSON.stringify(config);
+    await secretsManager.setSecret(`ai:${name}`, configJson, 'admin');
+    logger.info('AI model credentials stored successfully', { name });
+  } catch (error) {
+    logger.error('Failed to store AI model credentials', { name, error });
+    throw new Error('Failed to store AI model credentials');
+  }
+}
+
+export const getAIModelCredentials = async (name: string): Promise<AIModelConfig | null> => {
+  try {
+    const value = await secretsManager.getEncryptedSecret(`ai:${name}`);
+    if (!value) return null;
     return JSON.parse(value);
   } catch (error) {
-    console.error('Failed to parse n8n credentials:', error);
+    logger.error('Failed to parse AI model credentials', { name, error });
     return null;
   }
-};
-
-export const removeN8nCredentials = (name: string): boolean => {
-  const secretName = `n8n_${name}`;
-  return secretsManager.removeSecret(secretName);
 };

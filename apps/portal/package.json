@@ -4,17 +4,17 @@
   "description": "AgentHub Frontend Portal",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3001",
-    "build": "next build", 
-    "start": "next start -p 3001",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "next lint",
-    "clean": "rimraf .next",
     "typecheck": "tsc --noEmit",
     "dev:check": "npm run lint && npm run typecheck",
     "test": "echo \"Tests not yet implemented\"",
     "test:watch": "echo \"Tests not yet implemented\"",
     "db:migrate": "echo \"Run migrations in services/agent-hub/src/db/sql/\"",
-    "db:reset": "echo \"Reset database - run in Supabase dashboard\""
+    "db:reset": "echo \"Reset database - run in Supabase dashboard\"",
+    "ai:create-agent": "echo \"AI agent creation interface - coming soon!\""
   },
   "dependencies": {
     "@agent-hub/shared": "*",

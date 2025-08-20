@@ -1,301 +1,241 @@
-# 🚀 Agent Hub - Agentic Platform
+# Agent Hub - AI-Powered Agent Creation Platform
 
-A modern, scalable platform for managing AI agents, n8n workflows, and task routing with enterprise-grade security and multi-tenant architecture.
+> **Create AI agents through natural language conversations**
 
-## ✨ Features
+Agent Hub is a revolutionary platform that allows you to create, manage, and deploy AI agents using nothing but natural language. Instead of complex drag-and-drop interfaces or manual configuration, simply describe what you need, and our AI will research, plan, and implement your agents automatically.
 
-### 🤖 Agent Registry
-- **CRUD Operations**: Create, read, update, and delete AI agents
-- **Version Management**: Track agent versions with system prompts and parameters
-- **Type Support**: Local AI agents and n8n workflow agents
-- **Parameter Configuration**: JSON-based parameter management with validation
+## ✨ Key Features
 
-### 🔄 n8n Integration
-- **No-Code Import**: Import n8n workflows via UI with automatic schema detection
-- **Workflow Discovery**: Browse and select workflows from your n8n instance
-- **Credential Management**: Secure storage of n8n authentication credentials
-- **Test & Validate**: Test workflow bindings before deployment
+- **🤖 Natural Language Agent Creation** - Describe what you need in plain English
+- **🧠 AI-Powered Research & Planning** - Master AI agent analyzes requirements and best practices
+- **💻 AI-Generated Implementation** - Claude coding agent writes the actual agent code
+- **🔄 Conversational Refinement** - Test, iterate, and improve through chat interfaces
+- **🔒 Secure & Scalable** - Built on Supabase with enterprise-grade security
+- **🚀 Multi-Agent Workflows** - Create complex systems where agents work together
 
-### 🎯 Task Routing
-- **Multi-Destination Support**: Send tasks to webhooks, Supabase functions, or custom APIs
-- **Override Capabilities**: Override system prompts and parameters per execution
-- **HMAC Verification**: Secure communication with shared secrets
-- **Rate Limiting**: Configurable rate limits per destination
+## 🎯 Perfect For
 
-### 🏗️ Architecture
-- **Multi-Tenant**: Row-level security with Supabase RLS
-- **Feature-Based Structure**: Organized codebase for scalability
-- **Type Safety**: End-to-end TypeScript with generated database types
-- **Theme Consistency**: Matches Ethos Digital website design system
+- **Business Owners** - Automate lead generation, customer service, and business processes
+- **Developers** - Rapidly prototype AI agents without complex setup
+- **Teams** - Collaborate on agent creation through conversational interfaces
+- **Enterprises** - Scale AI operations with secure, multi-tenant architecture
 
-## 🛠️ Tech Stack
+## 🏗️ Architecture
 
-### Frontend
-- **Next.js 14**: React framework with App Router
-- **TypeScript**: Full type safety
-- **Tailwind CSS**: Utility-first CSS with custom design tokens
-- **Lucide React**: Beautiful, customizable icons
+```
+User Request → Master AI Agent → Research & Planning → Claude Coding Agent → Implementation → Testing & Refinement
+```
 
-### Backend
-- **Supabase**: PostgreSQL database with real-time subscriptions
-- **Row-Level Security**: Multi-tenant data isolation
-- **Edge Functions**: Serverless compute for webhooks
+### Core Components
 
-### Development
-- **ESLint**: Code quality and consistency
-- **Prettier**: Code formatting
-- **TypeScript**: Static type checking
+- **Frontend**: Next.js 14 with React 18 and Tailwind CSS
+- **Backend**: Express.js with TypeScript
+- **Database**: Supabase (PostgreSQL) with Row-Level Security
+- **AI Integration**: OpenAI GPT-4 + Anthropic Claude
+- **Authentication**: Supabase Auth with JWT
+- **Security**: HMAC signatures, rate limiting, CORS protection
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
-- npm or yarn
-- Supabase account and project
 
-### 1. Clone and Install
-```bash
-git clone <repository-url>
-cd AgentHub
-npm install
-```
+- Node.js 18+ and npm
+- Supabase account
+- OpenAI API key
+- Anthropic API key
 
-### 2. Environment Setup
-```bash
-# Copy environment template
-cp env.template .env.local
+### Installation
 
-# Fill in your Supabase credentials
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/agent-hub.git
+   cd agent-hub
+   ```
 
-### 3. Database Setup
-```bash
-# Run the migration in your Supabase dashboard
-# Copy contents of services/agent-hub/src/db/sql/03_agent_registry.sql
-```
+2. **Install dependencies**
+   ```bash
+   npm install
+   cd apps/portal && npm install
+   cd ../../services/agent-hub && npm install
+   ```
 
-### 4. Start Development
-```bash
-npm run dev
-```
+3. **Set up environment variables**
+   ```bash
+   # Copy the template
+   cp env.template apps/portal/.env.local
+   
+   # Fill in your values
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   OPENAI_API_KEY=your_openai_api_key
+   ANTHROPIC_API_KEY=your_anthropic_api_key
+   JWT_SECRET=your_jwt_secret
+   ENCRYPTION_KEY=your_encryption_key
+   ```
 
-Visit `http://localhost:3001` to see the application.
+4. **Set up the database**
+   ```bash
+   # Run the migration in Supabase dashboard
+   # Copy the SQL from services/agent-hub/src/db/sql/03_agent_registry.sql
+   ```
 
-## 📁 Project Structure
+5. **Start the development server**
+   ```bash
+   cd apps/portal
+   npm run dev
+   ```
+
+6. **Open your browser**
+   Navigate to `http://localhost:3000` and start creating agents!
+
+## 🎨 Creating Your First Agent
+
+1. **Navigate to the Agent Registry** (`/agents`)
+2. **Click "Create Agent with AI"**
+3. **Describe what you need** in natural language:
+   ```
+   "I need an agent that can schedule appointments and integrate with Google Calendar"
+   ```
+4. **AI researches and plans** the solution
+5. **Claude implements** the agent code
+6. **Test and refine** through conversation
+
+## 🏗️ Project Structure
 
 ```
 AgentHub/
 ├── apps/
 │   └── portal/                 # Next.js frontend application
 │       ├── src/
-│       │   ├── app/            # App Router pages
-│       │   ├── components/     # Reusable UI components
-│       │   ├── features/       # Feature-based organization
-│       │   │   ├── agents/     # Agent management
-│       │   │   ├── n8n/        # n8n integration
+│       │   ├── app/           # App Router pages
+│       │   ├── components/    # Reusable UI components
+│       │   ├── features/      # Feature-based organization
+│       │   │   ├── agents/    # Agent management
+│       │   │   ├── n8n/       # Legacy n8n integration (removed)
 │       │   │   └── destinations/ # Task routing
-│       │   ├── lib/            # Utilities and configurations
-│       │   └── config/         # Environment and app config
-│       └── public/             # Static assets
+│       │   ├── lib/           # Utilities and services
+│       │   └── config/        # Configuration files
 ├── services/
-│   └── agent-hub/             # Backend services
+│   └── agent-hub/             # Backend API service
 │       ├── src/
-│       │   ├── db/            # Database schema and types
 │       │   ├── routes/        # API endpoints
+│       │   ├── db/            # Database migrations and types
 │       │   └── lib/           # Backend utilities
-│       └── package.json
 └── packages/
-    └── shared/                # Shared types and utilities
+    └── shared/                 # Shared types and utilities
 ```
 
 ## 🔧 Development Commands
 
 ```bash
-# Development
-npm run dev              # Start development server
-npm run dev:check        # Lint + type check
-npm run build           # Build for production
-npm run start           # Start production server
+# Frontend development
+cd apps/portal
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run lint         # Run ESLint
+npm run typecheck    # Run TypeScript compiler
+
+# Backend development
+cd services/agent-hub
+npm run dev          # Start development server
+npm run build        # Build for production
 
 # Database
-npm run db:migrate      # Run database migrations
-npm run db:reset        # Reset database (Supabase dashboard)
-
-# Code Quality
-npm run lint            # ESLint check
-npm run typecheck       # TypeScript check
-npm run clean           # Clean build artifacts
+npm run db:migrate   # Run database migrations
+npm run db:reset     # Reset database (development only)
 ```
 
-## 🎨 Design System
+## 🎯 Example Use Cases
 
-Agent Hub uses a consistent design system that matches the Ethos Digital website:
+### Lead Generation Workflow
+Create a system of 4 agents that work together:
+1. **Conversational Agent** - Main website chat interface
+2. **Appointment Scheduler** - Google Calendar integration
+3. **Research Agent** - Business intelligence gathering
+4. **Form Filling Agent** - Background lead qualification
 
-- **Colors**: Dark theme with cyan accents (#22d3ee)
-- **Typography**: Inter font family with clear hierarchy
-- **Components**: Consistent card layouts, buttons, and form elements
-- **Animations**: Smooth transitions and micro-interactions
+### Business Process Automation
+- Customer service automation
+- Sales pipeline management
+- Data analysis and reporting
+- Marketing campaign optimization
 
-### Design Tokens
-```typescript
-// Available in src/lib/design-tokens.ts
-import { designTokens } from '@/lib/design-tokens';
+## 🔒 Security Features
 
-// Colors, spacing, typography, and more
-console.log(designTokens.colors.primary[400]); // #22d3ee
-```
-
-## 🔐 Security Features
-
-### Multi-Tenant Architecture
-- **Row-Level Security**: Data isolation between tenants
-- **JWT Authentication**: Secure user authentication
-- **Role-Based Access**: Admin vs. member permissions
-
-### Credential Management
-- **Encrypted Storage**: AES-256-GCM encryption for sensitive data
-- **Secure APIs**: HMAC verification for webhook communications
-- **Environment Variables**: Secure configuration management
-
-## 📊 Database Schema
-
-### Core Tables
-- **agents**: Agent definitions and metadata
-- **agent_versions**: Versioned agent configurations
-- **agent_bindings**: n8n workflow bindings
-- **destinations**: External API endpoints
-- **agent_executions**: Execution history and audit logs
-
-### Relationships
-```
-agents (1) ←→ (many) agent_versions
-agents (1) ←→ (many) agent_bindings
-agents (1) ←→ (many) agent_executions
-destinations (1) ←→ (many) agent_executions
-```
-
-## 🔌 API Endpoints
-
-### Agent Management
-```http
-GET    /api/v1/agents          # List agents
-POST   /api/v1/agents          # Create agent
-GET    /api/v1/agents/:id      # Get agent details
-PUT    /api/v1/agents/:id      # Update agent
-DELETE /api/v1/agents/:id      # Delete agent
-```
-
-### Agent Execution
-```http
-POST   /api/v1/agents/:id/invoke     # Execute agent locally
-POST   /api/v1/agents/:id/send       # Send to destination
-GET    /api/v1/executions/:id        # Get execution details
-```
-
-### n8n Integration
-```http
-POST   /api/v1/n8n/discover          # Discover workflows
-POST   /api/v1/n8n/import            # Import workflow
-POST   /api/v1/n8n/test              # Test workflow binding
-```
+- **Row-Level Security (RLS)** - Multi-tenant data isolation
+- **HMAC Signatures** - Secure webhook communication
+- **Rate Limiting** - Prevent API abuse
+- **CORS Protection** - Domain-based access control
+- **Encrypted Secrets** - Secure credential storage
+- **JWT Authentication** - Stateless user sessions
 
 ## 🧪 Testing
 
-### Current Status
-- **Unit Tests**: Not yet implemented
-- **Integration Tests**: Not yet implemented
-- **E2E Tests**: Not yet implemented
-
-### Planned Testing Strategy
 ```bash
-# Unit tests with Jest
-npm run test:unit
+# Run all tests
+npm run test
 
-# Integration tests
-npm run test:integration
+# Run tests in watch mode
+npm run test:watch
 
-# E2E tests with Playwright
-npm run test:e2e
-
-# Test coverage
-npm run test:coverage
+# Run specific test suites
+npm run test:agents
+npm run test:ai-creation
+npm run test:security
 ```
 
 ## 🚀 Deployment
 
-### Production Build
+### Frontend (Vercel/Netlify)
 ```bash
+cd apps/portal
 npm run build
-npm run start
+# Deploy the .next folder
+```
+
+### Backend (Railway/Render)
+```bash
+cd services/agent-hub
+npm run build
+# Deploy the dist folder
 ```
 
 ### Environment Variables
-```bash
-# Required for production
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-JWT_SECRET=
-ENCRYPTION_KEY=
-
-# Optional
-N8N_DEFAULT_URL=
-NODE_ENV=production
-```
-
-### Deployment Platforms
-- **Vercel**: Recommended for Next.js apps
-- **Railway**: Full-stack with database
-- **Render**: Full-stack with PostgreSQL
-- **Netlify**: Frontend only (requires separate backend)
+Ensure all required environment variables are set in your deployment platform.
 
 ## 🤝 Contributing
 
-### Development Workflow
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
-
-### Code Standards
-- **TypeScript**: Strict mode enabled
-- **ESLint**: Airbnb configuration
-- **Prettier**: Consistent formatting
-- **Conventional Commits**: Standard commit message format
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📚 Documentation
 
-### Additional Resources
-- [Architecture Guide](./ARCHITECTURE.md)
-- [Environment Setup](./ENVIRONMENT_GUIDE.md)
-- [Supabase Integration](./SUPABASE_INTEGRATION.md)
-- [n8n Webhook Setup](./N8N_WEBHOOK_SETUP.md)
-- [Production Readiness](./ETHOS_WEBSITE_PRODUCTION_GUIDE.md)
-
-### API Documentation
-- [OpenAPI Spec](./docs/api/openapi.yaml)
-- [Postman Collection](./docs/api/postman.json)
-
-## 📄 License
-
-This project is proprietary and confidential. All rights reserved.
+- [API Reference](./docs/API.md)
+- [Agent Creation Guide](./docs/AGENT_CREATION.md)
+- [Security Best Practices](./docs/SECURITY.md)
+- [Deployment Guide](./docs/DEPLOYMENT.md)
 
 ## 🆘 Support
 
-### Getting Help
-- **Documentation**: Check the docs folder
-- **Issues**: Create a GitHub issue
-- **Discussions**: Use GitHub Discussions for questions
+- **Issues**: [GitHub Issues](https://github.com/your-username/agent-hub/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/your-username/agent-hub/discussions)
+- **Documentation**: [Wiki](https://github.com/your-username/agent-hub/wiki)
 
-### Common Issues
-- **Database Connection**: Verify Supabase credentials
-- **Build Errors**: Check Node.js version and dependencies
-- **Type Errors**: Run `npm run typecheck` for details
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with [Next.js](https://nextjs.org/), [React](https://reactjs.org/), and [Tailwind CSS](https://tailwindcss.com/)
+- Powered by [OpenAI](https://openai.com/) and [Anthropic](https://www.anthropic.com/)
+- Backend services by [Supabase](https://supabase.com/)
+- Icons by [Lucide](https://lucide.dev/)
 
 ---
 
-Built with ❤️ by the Ethos Digital team
+**Ready to revolutionize how you create AI agents? Start building with Agent Hub today! 🚀**

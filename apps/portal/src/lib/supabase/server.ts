@@ -1,6 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { clientEnv, getServerEnv } from '@/config/env';
+import { logger } from '@/lib/logger';
 
 // Session-aware Supabase client for server components and API routes
 export function createClient() {
@@ -19,7 +20,7 @@ export function createClient() {
             cookieStore.set({ name, value, ...options });
           } catch (error) {
             // Cookie setting can fail during SSR
-            console.warn('Failed to set cookie during SSR:', name);
+            logger.warn('Failed to set cookie during SSR', { name, error });
           }
         },
         remove(name: string, options: CookieOptions) {
@@ -27,7 +28,7 @@ export function createClient() {
             cookieStore.set({ name, value: '', ...options });
           } catch (error) {
             // Cookie removal can fail during SSR
-            console.warn('Failed to remove cookie during SSR:', name);
+            logger.warn('Failed to remove cookie during SSR', { name, error });
           }
         },
       },

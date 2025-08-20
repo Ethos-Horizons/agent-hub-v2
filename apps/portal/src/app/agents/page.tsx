@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Bot, Settings, GitBranch, Sparkles } from 'lucide-react';
+import { Plus, Bot, Settings, GitBranch, Sparkles, Workflow, Play } from 'lucide-react';
+import Link from 'next/link';
 import { Agent } from '@/features/agents/types';
+import { LEAD_GEN_WORKFLOW } from '@/features/workflows/types';
 import { cn } from '@/lib/utils';
 
 // TODO: Replace with AI-generated agents from natural language conversations
@@ -41,9 +43,9 @@ const mockAgents: Agent[] = [
   {
     id: 'form-filling-agent',
     tenant_id: 'system',
+    slug: 'form-filling-agent',
     name: 'Form Filling Agent',
     kind: 'local',
-    slug: 'form-filling-agent',
     description: 'Background Google Forms completion for lead qualification',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -109,17 +111,26 @@ export default function AgentsPage() {
               AI-powered agents created through natural language conversations
             </p>
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-cyan-400 text-black rounded-lg hover:bg-cyan-300 transition-colors font-medium"
-          >
-            <Sparkles className="h-5 w-5" />
-            Create Agent with AI
-          </button>
+          <div className="flex gap-3">
+            <Link
+              href="/agents/create"
+              className="flex items-center gap-2 px-4 py-2 bg-cyan-400 text-black rounded-lg hover:bg-cyan-300 transition-colors font-medium"
+            >
+              <Sparkles className="h-5 w-5" />
+              Create Agent with AI
+            </Link>
+            <Link
+              href="/playground"
+              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-colors font-medium"
+            >
+              <Play className="h-5 w-5" />
+              Playground
+            </Link>
+          </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-gray-900 p-6 rounded-lg">
             <div className="flex items-center gap-3">
               <Bot className="h-8 w-8 text-green-500" />
@@ -142,13 +153,61 @@ export default function AgentsPage() {
           </div>
           <div className="bg-gray-900 p-6 rounded-lg">
             <div className="flex items-center gap-3">
-              <GitBranch className="h-8 w-8 text-blue-500" />
+              <Workflow className="h-8 w-8 text-blue-500" />
+              <div>
+                <p className="text-2xl font-bold text-white">1</p>
+                <p className="text-gray-400">Workflows</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-gray-900 p-6 rounded-lg">
+            <div className="flex items-center gap-3">
+              <GitBranch className="h-8 w-8 text-cyan-500" />
               <div>
                 <p className="text-2xl font-bold text-white">
                   {agents.filter(a => a.kind === 'local').length}
                 </p>
                 <p className="text-gray-400">Local Agents</p>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Lead Generation Workflow Preview */}
+        <div className="mb-8">
+          <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 p-6 rounded-lg border border-blue-800">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-semibold text-white mb-2">Lead Generation Workflow</h2>
+                <p className="text-blue-300 text-sm">
+                  A complete system of 4 agents working together to generate and qualify leads
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Link
+                  href="/playground"
+                  className="px-3 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors"
+                >
+                  Test in Playground
+                </Link>
+                <Link
+                  href="/workflows/lead-gen"
+                  className="px-3 py-2 bg-gray-700 text-white rounded text-sm hover:bg-gray-600 transition-colors"
+                >
+                  View Details
+                </Link>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {agents.map((agent) => (
+                <div key={agent.id} className="bg-gray-800/50 p-3 rounded border border-gray-700">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Bot className="h-4 w-4 text-green-400" />
+                    <span className="text-sm font-medium text-white">{agent.name}</span>
+                  </div>
+                  <p className="text-xs text-gray-400">{agent.description}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -185,12 +244,18 @@ export default function AgentsPage() {
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <button className="flex-1 px-3 py-2 bg-cyan-400 text-black rounded text-sm hover:bg-cyan-300 transition-colors">
+                    <Link
+                      href={`/playground?agent=${agent.id}`}
+                      className="flex-1 px-3 py-2 bg-cyan-400 text-black rounded text-sm hover:bg-cyan-300 transition-colors text-center"
+                    >
                       Test Agent
-                    </button>
-                    <button className="px-3 py-2 bg-gray-800 text-white rounded text-sm hover:bg-gray-700 transition-colors">
+                    </Link>
+                    <Link
+                      href={`/agents/${agent.slug}`}
+                      className="px-3 py-2 bg-gray-800 text-white rounded text-sm hover:bg-gray-700 transition-colors"
+                    >
                       <Settings className="h-4 w-4" />
-                    </button>
+                    </Link>
                   </div>
                 </div>
               ))}
@@ -206,12 +271,12 @@ export default function AgentsPage() {
             <p className="text-gray-500 mb-6">
               Start creating agents by describing what you need in natural language
             </p>
-            <button
-              onClick={() => setShowCreateModal(true)}
+            <Link
+              href="/agents/create"
               className="px-4 py-2 bg-cyan-400 text-black rounded-lg hover:bg-cyan-300 transition-colors font-medium"
             >
               Create Your First Agent
-            </button>
+            </Link>
           </div>
         )}
 

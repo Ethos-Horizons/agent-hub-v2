@@ -1,0 +1,1 @@
+INSERT INTO "public"."projects" ("id", "org_id", "name", "plan", "created_at") VALUES ('b21ef6e4-3bb1-4bbe-bdaf-ab71d741e09c', '968b8518-817b-404f-a7d2-2daf9e2ee9b0', 'Demo Project', 'presence', '2025-08-11 18:58:26.620844+00');

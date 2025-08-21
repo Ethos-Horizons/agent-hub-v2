@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import { supabaseAdmin, broadcastRunUpdate } from '../lib/supabase.js';
-import { callN8n } from '../lib/n8n.js';
+import { callOpenAI } from '../lib/models.js';
 import { logger } from '../lib/logger.js';
 import { ConversationRequest, ConversationResponse, MemoryUpdate, ConversationResponseT } from '@agent-hub/shared';
 
@@ -88,58 +88,34 @@ router.post('/', async (req, res) => {
     // Retrieve conversation memory for context
     const memoryContext = await getConversationMemory(sessionId, tenantId);
 
-    // Call n8n workflow
-    try {
-      await callN8n('conversational', {
-        conversationId: conversation.id,
-        messageId: messageRecord?.id,
-        tenantId,
-        input: {
-          message,
-          session_id: sessionId,
-          user_id,
-          context,
-          memory_context: memoryContext,
-          // Callback URL for n8n to report back
-          callback_url: `${process.env.API_BASE_URL || 'http://localhost:5000'}/api/callbacks/conversation`
-        }
+    // Run a local AI response for now
+    const prompt = `You are a helpful assistant. Reply to the user.\nUser: ${message}`;
+    const aiText = await callOpenAI(prompt, {
+      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+      maxTokens: 400,
+      temperature: 0.7,
+    });
+
+    // Save assistant message
+    await supabaseAdmin
+      .from('messages')
+      .insert({
+        conversation_id: conversation.id,
+        tenant_id: tenantId,
+        content: aiText,
+        message_type: 'bot',
+        metadata: { model: process.env.OPENAI_MODEL || 'gpt-4o-mini' }
       });
 
-      // Return immediate response
-      const response: ConversationResponseT = {
-        id: conversation.id,
-        message: "Processing your message...",
-        session_id: sessionId,
-        status: "processing",
-        metadata: {
-          response_time_ms: Date.now() - startTime
-        }
-      };
+    const response: ConversationResponseT = {
+      id: conversation.id,
+      message: aiText,
+      session_id: sessionId,
+      status: 'completed',
+      metadata: { response_time_ms: Date.now() - startTime }
+    };
 
-      res.json(response);
-
-    } catch (n8nError) {
-      logger.error({ error: n8nError }, 'n8n call failed');
-      
-      // Update conversation status to error
-      await supabaseAdmin
-        .from('conversations')
-        .update({ 
-          status: 'archived',
-          metadata: { 
-            error: n8nError instanceof Error ? n8nError.message : 'n8n call failed',
-            error_timestamp: new Date().toISOString()
-          }
-        })
-        .eq('id', conversation.id);
-
-      return res.status(500).json({ 
-        error: 'Failed to process conversation',
-        id: conversation.id,
-        session_id: sessionId,
-        status: "error"
-      });
-    }
+    res.json(response);
 
   } catch (error) {
     logger.error({ error }, 'Conversation endpoint error');

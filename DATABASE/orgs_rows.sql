@@ -1,0 +1,1 @@
+INSERT INTO "public"."orgs" ("id", "name", "created_at", "slug", "settings") VALUES ('968b8518-817b-404f-a7d2-2daf9e2ee9b0', 'Demo Org', '2025-08-11 18:58:26.620844+00', null, '{}'), ('d5da1d08-3e8c-42e0-82fe-5b19fbc20f26', 'Ethos Horizons', '2025-08-17 11:24:32.480575+00', 'ethos-horizons', '{"website":"https//ethoshorizons.com"}');

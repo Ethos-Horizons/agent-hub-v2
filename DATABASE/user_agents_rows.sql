@@ -1,0 +1,1 @@
+INSERT INTO "public"."user_agents" ("user_id", "agent_id", "created_at") VALUES ('9c0f6026-5339-4ff5-b23f-e77b152071d7', '283e928f-a1d2-412d-ac25-3fbe20bc9cba', '2025-08-17 12:07:26.96351+00'), ('9c0f6026-5339-4ff5-b23f-e77b152071d7', 'd49c185a-2e98-4721-a68a-9bac2f081ac1', '2025-08-17 12:07:26.96351+00');

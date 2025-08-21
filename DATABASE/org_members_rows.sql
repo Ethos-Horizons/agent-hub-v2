@@ -1,0 +1,1 @@
+INSERT INTO "public"."org_members" ("org_id", "user_id", "role", "created_at") VALUES ('968b8518-817b-404f-a7d2-2daf9e2ee9b0', '9c0f6026-5339-4ff5-b23f-e77b152071d7', 'owner', '2025-08-17 12:07:26.96351+00'), ('d5da1d08-3e8c-42e0-82fe-5b19fbc20f26', '9c0f6026-5339-4ff5-b23f-e77b152071d7', 'owner', '2025-08-17 12:07:26.96351+00');

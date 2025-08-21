@@ -68,6 +68,6 @@ export const logger = new Logger(
 
 // Feature-specific loggers
 export const agentLogger = logger.child('Agent');
-export const n8nLogger = logger.child('N8N');
+// legacy: n8n removed
 export const destinationLogger = logger.child('Destination');
 export const executionLogger = logger.child('Execution');

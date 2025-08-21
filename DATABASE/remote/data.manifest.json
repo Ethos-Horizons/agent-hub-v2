@@ -1,0 +1,98 @@
+{
+  "agent_bindings": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\agent_bindings.ndjson"
+  },
+  "agent_executions": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\agent_executions.ndjson"
+  },
+  "agent_memories": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\agent_memories.ndjson"
+  },
+  "agent_skills": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\agent_skills.ndjson"
+  },
+  "agent_versions": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\agent_versions.ndjson"
+  },
+  "agents": {
+    "rows": 2,
+    "file": "DATABASE\\remote\\data\\agents.ndjson"
+  },
+  "api_keys": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\api_keys.ndjson"
+  },
+  "artifacts": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\artifacts.ndjson"
+  },
+  "conversation_context": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\conversation_context.ndjson"
+  },
+  "conversations": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\conversations.ndjson"
+  },
+  "destinations": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\destinations.ndjson"
+  },
+  "knowledge_base": {
+    "rows": 1,
+    "file": "DATABASE\\remote\\data\\knowledge_base.ndjson"
+  },
+  "leads": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\leads.ndjson"
+  },
+  "memory": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\memory.ndjson"
+  },
+  "messages": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\messages.ndjson"
+  },
+  "org_members": {
+    "rows": 2,
+    "file": "DATABASE\\remote\\data\\org_members.ndjson"
+  },
+  "organizations": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\organizations.ndjson"
+  },
+  "orgs": {
+    "rows": 2,
+    "file": "DATABASE\\remote\\data\\orgs.ndjson"
+  },
+  "profiles": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\profiles.ndjson"
+  },
+  "projects": {
+    "rows": 1,
+    "file": "DATABASE\\remote\\data\\projects.ndjson"
+  },
+  "runs": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\runs.ndjson"
+  },
+  "system_settings": {
+    "rows": 0,
+    "file": "DATABASE\\remote\\data\\system_settings.ndjson"
+  },
+  "user_agents": {
+    "rows": 2,
+    "file": "DATABASE\\remote\\data\\user_agents.ndjson"
+  },
+  "user_roles": {
+    "rows": 1,
+    "file": "DATABASE\\remote\\data\\user_roles.ndjson"
+  }
+}

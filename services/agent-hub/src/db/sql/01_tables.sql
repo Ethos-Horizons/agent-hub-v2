@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS public.runs (
   output JSONB,
   cost_usd NUMERIC(10,4) DEFAULT 0,
   latency_ms INTEGER DEFAULT 0,
-  n8n_execution_id TEXT,
+  -- legacy: n8n_execution_id removed with local AI execution
   error TEXT,
   metadata JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW(),

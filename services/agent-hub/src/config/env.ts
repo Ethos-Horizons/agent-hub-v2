@@ -10,8 +10,13 @@ const serverEnvSchema = z.object({
   // Security
   HMAC_WEBHOOK_SECRET: z.string().min(32, 'HMAC_WEBHOOK_SECRET must be at least 32 characters'),
   
-  // n8n integration
-  N8N_BASE_URL: z.string().url().optional(),
+  // AI providers
+  OPENAI_API_KEY: z.string().optional(),
+  ANTHROPIC_API_KEY: z.string().optional(),
+  GEMINI_API_KEY: z.string().optional(),
+  OPENAI_MODEL: z.string().optional(),
+  ANTHROPIC_MODEL: z.string().optional(),
+  GEMINI_MODEL: z.string().optional(),
   
   // Optional features
   LANGFUSE_PUBLIC_KEY: z.string().optional(),

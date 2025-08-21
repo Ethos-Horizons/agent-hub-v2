@@ -2,7 +2,7 @@ export interface Agent {
   id: string;
   tenant_id: string;
   name: string;
-  kind: 'local' | 'n8n';
+  kind: 'local';
   slug: string;
   description: string;
   created_at: string;
@@ -22,8 +22,9 @@ export interface AgentVersion {
 export interface AgentBinding {
   id: string;
   agent_id: string;
-  n8n_base_url: string;
-  workflow_id: string;
+  // model/config binding (replaces legacy n8n fields)
+  provider?: 'openai' | 'anthropic' | 'gemini' | 'custom';
+  model?: string;
   auth_kind: 'apiKey' | 'basic' | 'oauth';
   credentials_ref: string;
   input_schema: Record<string, any>;
@@ -48,7 +49,7 @@ export interface AgentExecution {
 
 export interface CreateAgentRequest {
   name: string;
-  kind: 'local' | 'n8n';
+  kind: 'local';
   description: string;
   system_prompt: string;
   default_params?: Record<string, any>;

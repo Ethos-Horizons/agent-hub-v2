@@ -1,0 +1,2535 @@
+{
+  "enums": [
+    {
+      "name": "agent_kind",
+      "labels": [
+        "local",
+        "n8n"
+      ]
+    },
+    {
+      "name": "agent_version_status",
+      "labels": [
+        "draft",
+        "active",
+        "deprecated"
+      ]
+    },
+    {
+      "name": "auth_kind",
+      "labels": [
+        "apiKey",
+        "basic",
+        "oauth"
+      ]
+    },
+    {
+      "name": "destination_kind",
+      "labels": [
+        "webhook",
+        "supabase-func",
+        "custom"
+      ]
+    },
+    {
+      "name": "execution_status",
+      "labels": [
+        "queued",
+        "running",
+        "succeeded",
+        "failed"
+      ]
+    }
+  ],
+  "tables": {
+    "agent_bindings": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()"
+        },
+        {
+          "column_name": "agent_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "n8n_base_url",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "workflow_id",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "auth_kind",
+          "data_type": "USER-DEFINED",
+          "udt_name": "auth_kind",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "credentials_ref",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "input_schema",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "'{}'::jsonb"
+        },
+        {
+          "column_name": "output_schema",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "'{}'::jsonb"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [
+        {
+          "conname": "agent_bindings_agent_id_fkey",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "agent_bindings_agent_id_workflow_id_key",
+          "indexdef": "CREATE UNIQUE INDEX agent_bindings_agent_id_workflow_id_key ON public.agent_bindings USING btree (agent_id, workflow_id)"
+        },
+        {
+          "indexname": "agent_bindings_pkey",
+          "indexdef": "CREATE UNIQUE INDEX agent_bindings_pkey ON public.agent_bindings USING btree (id)"
+        },
+        {
+          "indexname": "idx_agent_bindings_agent_id",
+          "indexdef": "CREATE INDEX idx_agent_bindings_agent_id ON public.agent_bindings USING btree (agent_id)"
+        },
+        {
+          "indexname": "idx_agent_bindings_workflow_id",
+          "indexdef": "CREATE INDEX idx_agent_bindings_workflow_id ON public.agent_bindings USING btree (workflow_id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Users can delete their own agent bindings",
+          "cmd": "DELETE",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM user_agents\n  WHERE ((user_agents.user_id = auth.uid()) AND (user_agents.agent_id = agent_bindings.agent_id))))",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can insert their own agent bindings",
+          "cmd": "INSERT",
+          "permissive": "PERMISSIVE",
+          "using": null,
+          "with_check": "(EXISTS ( SELECT 1\n   FROM user_agents\n  WHERE ((user_agents.user_id = auth.uid()) AND (user_agents.agent_id = agent_bindings.agent_id))))"
+        },
+        {
+          "policyname": "Users can update their own agent bindings",
+          "cmd": "UPDATE",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM user_agents\n  WHERE ((user_agents.user_id = auth.uid()) AND (user_agents.agent_id = agent_bindings.agent_id))))",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can view their own agent bindings",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM user_agents\n  WHERE ((user_agents.user_id = auth.uid()) AND (user_agents.agent_id = agent_bindings.agent_id))))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "agent_executions": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()"
+        },
+        {
+          "column_name": "tenant_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "agent_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "agent_version_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "destination_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "input",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "'{}'::jsonb"
+        },
+        {
+          "column_name": "output",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "'{}'::jsonb"
+        },
+        {
+          "column_name": "status",
+          "data_type": "USER-DEFINED",
+          "udt_name": "execution_status",
+          "is_nullable": "YES",
+          "column_default": "'queued'::execution_status"
+        },
+        {
+          "column_name": "started_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "finished_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "error_text",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "metadata",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "'{}'::jsonb"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [
+        {
+          "conname": "agent_executions_agent_id_fkey",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "agent_executions_agent_version_id_fkey",
+          "definition": "FOREIGN KEY (agent_version_id) REFERENCES agent_versions(id) ON DELETE SET NULL"
+        },
+        {
+          "conname": "agent_executions_destination_id_fkey",
+          "definition": "FOREIGN KEY (destination_id) REFERENCES destinations(id) ON DELETE SET NULL"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "agent_executions_pkey",
+          "indexdef": "CREATE UNIQUE INDEX agent_executions_pkey ON public.agent_executions USING btree (id)"
+        },
+        {
+          "indexname": "idx_agent_executions_agent_id",
+          "indexdef": "CREATE INDEX idx_agent_executions_agent_id ON public.agent_executions USING btree (agent_id)"
+        },
+        {
+          "indexname": "idx_agent_executions_created_at",
+          "indexdef": "CREATE INDEX idx_agent_executions_created_at ON public.agent_executions USING btree (created_at)"
+        },
+        {
+          "indexname": "idx_agent_executions_status",
+          "indexdef": "CREATE INDEX idx_agent_executions_status ON public.agent_executions USING btree (status)"
+        },
+        {
+          "indexname": "idx_agent_executions_tenant_id",
+          "indexdef": "CREATE INDEX idx_agent_executions_tenant_id ON public.agent_executions USING btree (tenant_id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Service role can manage executions",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(auth.role() = 'service_role'::text)",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can view their own executions",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "(tenant_id = auth.uid())",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "agent_memories": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "uuid_generate_v4()"
+        },
+        {
+          "column_name": "agent_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "content",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "embedding",
+          "data_type": "USER-DEFINED",
+          "udt_name": "vector",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "metadata",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "'{}'::jsonb"
+        },
+        {
+          "column_name": "importance_score",
+          "data_type": "double precision",
+          "udt_name": "float8",
+          "is_nullable": "YES",
+          "column_default": "0.5"
+        },
+        {
+          "column_name": "memory_type",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "YES",
+          "column_default": "'conversation'::character varying"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "last_accessed",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "access_count",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "YES",
+          "column_default": "0"
+        },
+        {
+          "column_name": "tenant_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [
+        {
+          "conname": "agent_memories_agent_id_fkey",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "agent_memories_agent_id_idx",
+          "indexdef": "CREATE INDEX agent_memories_agent_id_idx ON public.agent_memories USING btree (agent_id)"
+        },
+        {
+          "indexname": "agent_memories_created_at_idx",
+          "indexdef": "CREATE INDEX agent_memories_created_at_idx ON public.agent_memories USING btree (created_at)"
+        },
+        {
+          "indexname": "agent_memories_embedding_idx",
+          "indexdef": "CREATE INDEX agent_memories_embedding_idx ON public.agent_memories USING ivfflat (embedding vector_cosine_ops) WITH (lists='100')"
+        },
+        {
+          "indexname": "agent_memories_pkey",
+          "indexdef": "CREATE UNIQUE INDEX agent_memories_pkey ON public.agent_memories USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Allow all operations for authenticated users",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "true",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can access their tenant's agent memories",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(tenant_id IN ( SELECT org_members.org_id\n   FROM org_members\n  WHERE (org_members.user_id = auth_user_id())))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "agent_skills": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "uuid_generate_v4()"
+        },
+        {
+          "column_name": "agent_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "skill_name",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "skill_description",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "examples",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "'[]'::jsonb"
+        },
+        {
+          "column_name": "embedding",
+          "data_type": "USER-DEFINED",
+          "udt_name": "vector",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "usage_count",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "YES",
+          "column_default": "0"
+        },
+        {
+          "column_name": "success_rate",
+          "data_type": "double precision",
+          "udt_name": "float8",
+          "is_nullable": "YES",
+          "column_default": "0.0"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "tenant_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [
+        {
+          "conname": "agent_skills_agent_id_fkey",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "agent_skills_agent_id_idx",
+          "indexdef": "CREATE INDEX agent_skills_agent_id_idx ON public.agent_skills USING btree (agent_id)"
+        },
+        {
+          "indexname": "agent_skills_embedding_idx",
+          "indexdef": "CREATE INDEX agent_skills_embedding_idx ON public.agent_skills USING ivfflat (embedding vector_cosine_ops) WITH (lists='100')"
+        },
+        {
+          "indexname": "agent_skills_pkey",
+          "indexdef": "CREATE UNIQUE INDEX agent_skills_pkey ON public.agent_skills USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Allow all operations for authenticated users",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "true",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can access their tenant's agent skills",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(tenant_id IN ( SELECT org_members.org_id\n   FROM org_members\n  WHERE (org_members.user_id = auth_user_id())))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "agent_versions": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()"
+        },
+        {
+          "column_name": "agent_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "version",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "system_prompt",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "default_params",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "'{}'::jsonb"
+        },
+        {
+          "column_name": "status",
+          "data_type": "USER-DEFINED",
+          "udt_name": "agent_version_status",
+          "is_nullable": "YES",
+          "column_default": "'draft'::agent_version_status"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [
+        {
+          "conname": "agent_versions_agent_id_fkey",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "agent_versions_agent_id_version_key",
+          "indexdef": "CREATE UNIQUE INDEX agent_versions_agent_id_version_key ON public.agent_versions USING btree (agent_id, version)"
+        },
+        {
+          "indexname": "agent_versions_pkey",
+          "indexdef": "CREATE UNIQUE INDEX agent_versions_pkey ON public.agent_versions USING btree (id)"
+        },
+        {
+          "indexname": "idx_agent_versions_agent_id",
+          "indexdef": "CREATE INDEX idx_agent_versions_agent_id ON public.agent_versions USING btree (agent_id)"
+        },
+        {
+          "indexname": "idx_agent_versions_status",
+          "indexdef": "CREATE INDEX idx_agent_versions_status ON public.agent_versions USING btree (status)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Users can delete their own agent versions",
+          "cmd": "DELETE",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM user_agents\n  WHERE ((user_agents.user_id = auth.uid()) AND (user_agents.agent_id = agent_versions.agent_id))))",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can insert their own agent versions",
+          "cmd": "INSERT",
+          "permissive": "PERMISSIVE",
+          "using": null,
+          "with_check": "(EXISTS ( SELECT 1\n   FROM user_agents\n  WHERE ((user_agents.user_id = auth.uid()) AND (user_agents.agent_id = agent_versions.agent_id))))"
+        },
+        {
+          "policyname": "Users can update their own agent versions",
+          "cmd": "UPDATE",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM user_agents\n  WHERE ((user_agents.user_id = auth.uid()) AND (user_agents.agent_id = agent_versions.agent_id))))",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can view their own agent versions",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM user_agents\n  WHERE ((user_agents.user_id = auth.uid()) AND (user_agents.agent_id = agent_versions.agent_id))))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "agents": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "uuid_generate_v4()"
+        },
+        {
+          "column_name": "name",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "type",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "description",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "status",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "YES",
+          "column_default": "'inactive'::character varying"
+        },
+        {
+          "column_name": "version",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "YES",
+          "column_default": "'1.0.0'::character varying"
+        },
+        {
+          "column_name": "config",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "'{}'::jsonb"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "tenant_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [],
+      "indexes": [
+        {
+          "indexname": "agents_pkey",
+          "indexdef": "CREATE UNIQUE INDEX agents_pkey ON public.agents USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Admins have full access to agents",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM user_roles\n  WHERE ((user_roles.user_id = ( SELECT auth.uid() AS uid)) AND (user_roles.role = 'admin'::text))))",
+          "with_check": null
+        },
+        {
+          "policyname": "Allow all operations for authenticated users",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "true",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can access their tenant's agents",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(tenant_id IN ( SELECT org_members.org_id\n   FROM org_members\n  WHERE (org_members.user_id = auth_user_id())))",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can delete their own agents",
+          "cmd": "DELETE",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM user_agents\n  WHERE ((user_agents.user_id = ( SELECT auth.uid() AS uid)) AND (user_agents.agent_id = agents.id))))",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can insert agents",
+          "cmd": "INSERT",
+          "permissive": "PERMISSIVE",
+          "using": null,
+          "with_check": "true"
+        },
+        {
+          "policyname": "Users can update their own agents",
+          "cmd": "UPDATE",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM user_agents\n  WHERE ((user_agents.user_id = ( SELECT auth.uid() AS uid)) AND (user_agents.agent_id = agents.id))))",
+          "with_check": "(EXISTS ( SELECT 1\n   FROM user_agents\n  WHERE ((user_agents.user_id = ( SELECT auth.uid() AS uid)) AND (user_agents.agent_id = agents.id))))"
+        },
+        {
+          "policyname": "Users can view their own agents",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM user_agents\n  WHERE ((user_agents.user_id = ( SELECT auth.uid() AS uid)) AND (user_agents.agent_id = agents.id))))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "api_keys": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "uuid_generate_v4()"
+        },
+        {
+          "column_name": "provider",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "key_name",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "encrypted_key",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "is_active",
+          "data_type": "boolean",
+          "udt_name": "bool",
+          "is_nullable": "YES",
+          "column_default": "true"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "tenant_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [],
+      "indexes": [
+        {
+          "indexname": "api_keys_pkey",
+          "indexdef": "CREATE UNIQUE INDEX api_keys_pkey ON public.api_keys USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Allow all operations for authenticated users",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "true",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can access their tenant's API keys",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(tenant_id IN ( SELECT org_members.org_id\n   FROM org_members\n  WHERE (org_members.user_id = auth_user_id())))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "artifacts": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()"
+        },
+        {
+          "column_name": "run_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "kind",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "title",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "url",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "content",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [
+        {
+          "conname": "artifacts_run_id_fkey",
+          "definition": "FOREIGN KEY (run_id) REFERENCES runs(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "artifacts_pkey",
+          "indexdef": "CREATE UNIQUE INDEX artifacts_pkey ON public.artifacts USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Users can create artifacts for their runs",
+          "cmd": "INSERT",
+          "permissive": "PERMISSIVE",
+          "using": null,
+          "with_check": "(EXISTS ( SELECT 1\n   FROM ((runs r\n     JOIN projects p ON ((r.project_id = p.id)))\n     JOIN org_members om ON ((p.org_id = om.org_id)))\n  WHERE ((om.user_id = ( SELECT auth.uid() AS uid)) AND (r.id = artifacts.run_id))))"
+        },
+        {
+          "policyname": "Users can view artifacts for their runs",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM ((runs r\n     JOIN projects p ON ((r.project_id = p.id)))\n     JOIN org_members om ON ((p.org_id = om.org_id)))\n  WHERE ((om.user_id = ( SELECT auth.uid() AS uid)) AND (r.id = artifacts.run_id))))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "conversation_context": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "uuid_generate_v4()"
+        },
+        {
+          "column_name": "conversation_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "agent_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "context_window",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "embedding",
+          "data_type": "USER-DEFINED",
+          "udt_name": "vector",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "turn_count",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "tenant_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [
+        {
+          "conname": "conversation_context_agent_id_fkey",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "conversation_context_conversation_id_fkey",
+          "definition": "FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "conversation_context_conversation_id_idx",
+          "indexdef": "CREATE INDEX conversation_context_conversation_id_idx ON public.conversation_context USING btree (conversation_id)"
+        },
+        {
+          "indexname": "conversation_context_embedding_idx",
+          "indexdef": "CREATE INDEX conversation_context_embedding_idx ON public.conversation_context USING ivfflat (embedding vector_cosine_ops) WITH (lists='100')"
+        },
+        {
+          "indexname": "conversation_context_pkey",
+          "indexdef": "CREATE UNIQUE INDEX conversation_context_pkey ON public.conversation_context USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Allow all operations for authenticated users",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "true",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can access their tenant's conversation contexts",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(tenant_id IN ( SELECT org_members.org_id\n   FROM org_members\n  WHERE (org_members.user_id = auth_user_id())))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "conversations": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "uuid_generate_v4()"
+        },
+        {
+          "column_name": "visitor_id",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "session_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "start_time",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "end_time",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "status",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "YES",
+          "column_default": "'active'::character varying"
+        },
+        {
+          "column_name": "intent",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "lead_qualified",
+          "data_type": "boolean",
+          "udt_name": "bool",
+          "is_nullable": "YES",
+          "column_default": "false"
+        },
+        {
+          "column_name": "tenant_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [],
+      "indexes": [
+        {
+          "indexname": "conversations_pkey",
+          "indexdef": "CREATE UNIQUE INDEX conversations_pkey ON public.conversations USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Allow all operations for authenticated users",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "true",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can access their tenant's conversations",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(tenant_id IN ( SELECT org_members.org_id\n   FROM org_members\n  WHERE (org_members.user_id = auth_user_id())))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "destinations": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()"
+        },
+        {
+          "column_name": "tenant_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "name",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "kind",
+          "data_type": "USER-DEFINED",
+          "udt_name": "destination_kind",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "endpoint_url",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "headers",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "'{}'::jsonb"
+        },
+        {
+          "column_name": "auth_config",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "'{}'::jsonb"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [],
+      "indexes": [
+        {
+          "indexname": "destinations_pkey",
+          "indexdef": "CREATE UNIQUE INDEX destinations_pkey ON public.destinations USING btree (id)"
+        },
+        {
+          "indexname": "idx_destinations_tenant_id",
+          "indexdef": "CREATE INDEX idx_destinations_tenant_id ON public.destinations USING btree (tenant_id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Users can delete their own destinations",
+          "cmd": "DELETE",
+          "permissive": "PERMISSIVE",
+          "using": "(tenant_id = auth.uid())",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can insert their own destinations",
+          "cmd": "INSERT",
+          "permissive": "PERMISSIVE",
+          "using": null,
+          "with_check": "(tenant_id = auth.uid())"
+        },
+        {
+          "policyname": "Users can update their own destinations",
+          "cmd": "UPDATE",
+          "permissive": "PERMISSIVE",
+          "using": "(tenant_id = auth.uid())",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can view their own destinations",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "(tenant_id = auth.uid())",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "knowledge_base": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "uuid_generate_v4()"
+        },
+        {
+          "column_name": "agent_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "title",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "content",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "embedding",
+          "data_type": "USER-DEFINED",
+          "udt_name": "vector",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "source_type",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "YES",
+          "column_default": "'document'::character varying"
+        },
+        {
+          "column_name": "source_url",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "metadata",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "'{}'::jsonb"
+        },
+        {
+          "column_name": "chunk_index",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "YES",
+          "column_default": "0"
+        },
+        {
+          "column_name": "parent_document_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "tenant_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [
+        {
+          "conname": "knowledge_base_agent_id_fkey",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "knowledge_base_agent_id_idx",
+          "indexdef": "CREATE INDEX knowledge_base_agent_id_idx ON public.knowledge_base USING btree (agent_id)"
+        },
+        {
+          "indexname": "knowledge_base_embedding_idx",
+          "indexdef": "CREATE INDEX knowledge_base_embedding_idx ON public.knowledge_base USING ivfflat (embedding vector_cosine_ops) WITH (lists='100')"
+        },
+        {
+          "indexname": "knowledge_base_pkey",
+          "indexdef": "CREATE UNIQUE INDEX knowledge_base_pkey ON public.knowledge_base USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Allow all operations for authenticated users",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "true",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can access their tenant's knowledge base",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(tenant_id IN ( SELECT org_members.org_id\n   FROM org_members\n  WHERE (org_members.user_id = auth_user_id())))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "leads": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "uuid_generate_v4()"
+        },
+        {
+          "column_name": "conversation_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "visitor_info",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "qualification_data",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "status",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "YES",
+          "column_default": "'new'::character varying"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "tenant_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [
+        {
+          "conname": "leads_conversation_id_fkey",
+          "definition": "FOREIGN KEY (conversation_id) REFERENCES conversations(id)"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "leads_pkey",
+          "indexdef": "CREATE UNIQUE INDEX leads_pkey ON public.leads USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Allow all operations for authenticated users",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "true",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can access their tenant's leads",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(tenant_id IN ( SELECT org_members.org_id\n   FROM org_members\n  WHERE (org_members.user_id = auth_user_id())))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "memory": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "bigint",
+          "udt_name": "int8",
+          "is_nullable": "NO",
+          "column_default": "nextval('memory_id_seq'::regclass)"
+        },
+        {
+          "column_name": "project_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "doc_id",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "content",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "embedding",
+          "data_type": "USER-DEFINED",
+          "udt_name": "vector",
+          "is_nullable": "YES",
+          "column_default": null
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [
+        {
+          "conname": "memory_project_id_fkey",
+          "definition": "FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "idx_memory_project_id",
+          "indexdef": "CREATE INDEX idx_memory_project_id ON public.memory USING btree (project_id)"
+        },
+        {
+          "indexname": "memory_embedding_idx",
+          "indexdef": "CREATE INDEX memory_embedding_idx ON public.memory USING ivfflat (embedding vector_cosine_ops) WITH (lists='100')"
+        },
+        {
+          "indexname": "memory_pkey",
+          "indexdef": "CREATE UNIQUE INDEX memory_pkey ON public.memory USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Users can access their project's memory",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(project_id IN ( SELECT org_members.org_id\n   FROM org_members\n  WHERE (org_members.user_id = auth_user_id())))",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can create memory for their projects",
+          "cmd": "INSERT",
+          "permissive": "PERMISSIVE",
+          "using": null,
+          "with_check": "(EXISTS ( SELECT 1\n   FROM (projects p\n     JOIN org_members om ON ((p.org_id = om.org_id)))\n  WHERE ((om.user_id = ( SELECT auth.uid() AS uid)) AND (p.id = memory.project_id))))"
+        },
+        {
+          "policyname": "Users can view memory for their projects",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM (projects p\n     JOIN org_members om ON ((p.org_id = om.org_id)))\n  WHERE ((om.user_id = ( SELECT auth.uid() AS uid)) AND (p.id = memory.project_id))))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "messages": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "uuid_generate_v4()"
+        },
+        {
+          "column_name": "conversation_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "message_type",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "content",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "timestamp",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "metadata",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "'{}'::jsonb"
+        },
+        {
+          "column_name": "tenant_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [
+        {
+          "conname": "messages_conversation_id_fkey",
+          "definition": "FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "messages_pkey",
+          "indexdef": "CREATE UNIQUE INDEX messages_pkey ON public.messages USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Allow all operations for authenticated users",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "true",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can access their tenant's messages",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(tenant_id IN ( SELECT org_members.org_id\n   FROM org_members\n  WHERE (org_members.user_id = auth_user_id())))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "org_members": {
+      "columns": [
+        {
+          "column_name": "org_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "role",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": "'member'::text"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "org_id",
+        "user_id"
+      ],
+      "fks": [
+        {
+          "conname": "org_members_org_id_fkey",
+          "definition": "FOREIGN KEY (org_id) REFERENCES orgs(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "org_members_user_id_fkey",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "idx_org_members_user_id",
+          "indexdef": "CREATE INDEX idx_org_members_user_id ON public.org_members USING btree (user_id)"
+        },
+        {
+          "indexname": "org_members_pkey",
+          "indexdef": "CREATE UNIQUE INDEX org_members_pkey ON public.org_members USING btree (org_id, user_id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Admins have full access to org_members",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM user_roles\n  WHERE ((user_roles.user_id = ( SELECT auth.uid() AS uid)) AND (user_roles.role = 'admin'::text))))",
+          "with_check": null
+        },
+        {
+          "policyname": "Org owners can manage members",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM org_members org_members_1\n  WHERE ((org_members_1.user_id = ( SELECT auth.uid() AS uid)) AND (org_members_1.org_id = org_members_1.org_id) AND (org_members_1.role = 'owner'::text))))",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can view members in their organizations",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "(org_id IN ( SELECT org_members_1.org_id\n   FROM org_members org_members_1\n  WHERE (org_members_1.user_id = auth_user_id())))",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can view members of their orgs",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM org_members om\n  WHERE ((om.org_id = org_members.org_id) AND (om.user_id = ( SELECT auth.uid() AS uid)))))",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can view their org memberships",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "(user_id = ( SELECT auth.uid() AS uid))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "organizations": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()"
+        },
+        {
+          "column_name": "name",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "slug",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "logo_url",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [],
+      "indexes": [
+        {
+          "indexname": "organizations_pkey",
+          "indexdef": "CREATE UNIQUE INDEX organizations_pkey ON public.organizations USING btree (id)"
+        },
+        {
+          "indexname": "organizations_slug_key",
+          "indexdef": "CREATE UNIQUE INDEX organizations_slug_key ON public.organizations USING btree (slug)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Users can view their organizations",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "(id IN ( SELECT org_members.org_id\n   FROM org_members\n  WHERE (org_members.user_id = auth_user_id())))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "orgs": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()"
+        },
+        {
+          "column_name": "name",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "slug",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "settings",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "'{}'::jsonb"
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [],
+      "indexes": [
+        {
+          "indexname": "orgs_pkey",
+          "indexdef": "CREATE UNIQUE INDEX orgs_pkey ON public.orgs USING btree (id)"
+        },
+        {
+          "indexname": "orgs_slug_key",
+          "indexdef": "CREATE UNIQUE INDEX orgs_slug_key ON public.orgs USING btree (slug)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Admins have full access to orgs",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM user_roles\n  WHERE ((user_roles.user_id = ( SELECT auth.uid() AS uid)) AND (user_roles.role = 'admin'::text))))",
+          "with_check": null
+        },
+        {
+          "policyname": "Owners can delete orgs",
+          "cmd": "DELETE",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM org_members\n  WHERE ((org_members.user_id = ( SELECT auth.uid() AS uid)) AND (org_members.org_id = orgs.id) AND (org_members.role = 'owner'::text))))",
+          "with_check": null
+        },
+        {
+          "policyname": "Owners can update orgs",
+          "cmd": "UPDATE",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM org_members\n  WHERE ((org_members.user_id = ( SELECT auth.uid() AS uid)) AND (org_members.org_id = orgs.id) AND (org_members.role = 'owner'::text))))",
+          "with_check": "(EXISTS ( SELECT 1\n   FROM org_members\n  WHERE ((org_members.user_id = ( SELECT auth.uid() AS uid)) AND (org_members.org_id = orgs.id) AND (org_members.role = 'owner'::text))))"
+        },
+        {
+          "policyname": "Users can create orgs",
+          "cmd": "INSERT",
+          "permissive": "PERMISSIVE",
+          "using": null,
+          "with_check": "true"
+        },
+        {
+          "policyname": "Users can view their orgs",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM org_members\n  WHERE ((org_members.user_id = ( SELECT auth.uid() AS uid)) AND (org_members.org_id = orgs.id))))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "profiles": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "full_name",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "avatar_url",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [
+        {
+          "conname": "profiles_id_fkey",
+          "definition": "FOREIGN KEY (id) REFERENCES auth.users(id)"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "profiles_pkey",
+          "indexdef": "CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Users can update their own profile",
+          "cmd": "UPDATE",
+          "permissive": "PERMISSIVE",
+          "using": "(id = auth_user_id())",
+          "with_check": "(id = auth_user_id())"
+        },
+        {
+          "policyname": "Users can view profiles",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "true",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "projects": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()"
+        },
+        {
+          "column_name": "org_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "name",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "plan",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": "'presence'::text"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [
+        {
+          "conname": "projects_org_id_fkey",
+          "definition": "FOREIGN KEY (org_id) REFERENCES orgs(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "projects_pkey",
+          "indexdef": "CREATE UNIQUE INDEX projects_pkey ON public.projects USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Org owners can manage projects",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM org_members\n  WHERE ((org_members.user_id = ( SELECT auth.uid() AS uid)) AND (org_members.org_id = projects.org_id) AND (org_members.role = 'owner'::text))))",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can view projects in their orgs",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM org_members\n  WHERE ((org_members.user_id = ( SELECT auth.uid() AS uid)) AND (org_members.org_id = projects.org_id))))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "runs": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()"
+        },
+        {
+          "column_name": "project_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "agent",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "status",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": "'queued'::text"
+        },
+        {
+          "column_name": "input",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "output",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "cost_usd",
+          "data_type": "numeric",
+          "udt_name": "numeric",
+          "is_nullable": "YES",
+          "column_default": "0"
+        },
+        {
+          "column_name": "latency_ms",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "YES",
+          "column_default": "0"
+        },
+        {
+          "column_name": "n8n_execution_id",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "error",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [
+        {
+          "conname": "runs_project_id_fkey",
+          "definition": "FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "idx_runs_project_id",
+          "indexdef": "CREATE INDEX idx_runs_project_id ON public.runs USING btree (project_id)"
+        },
+        {
+          "indexname": "idx_runs_status",
+          "indexdef": "CREATE INDEX idx_runs_status ON public.runs USING btree (status)"
+        },
+        {
+          "indexname": "runs_pkey",
+          "indexdef": "CREATE UNIQUE INDEX runs_pkey ON public.runs USING btree (id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Users can create runs in their projects",
+          "cmd": "INSERT",
+          "permissive": "PERMISSIVE",
+          "using": null,
+          "with_check": "(EXISTS ( SELECT 1\n   FROM (projects p\n     JOIN org_members om ON ((p.org_id = om.org_id)))\n  WHERE ((om.user_id = ( SELECT auth.uid() AS uid)) AND (p.id = runs.project_id))))"
+        },
+        {
+          "policyname": "Users can update runs in their projects",
+          "cmd": "UPDATE",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM (projects p\n     JOIN org_members om ON ((p.org_id = om.org_id)))\n  WHERE ((om.user_id = ( SELECT auth.uid() AS uid)) AND (p.id = runs.project_id))))",
+          "with_check": "(EXISTS ( SELECT 1\n   FROM (projects p\n     JOIN org_members om ON ((p.org_id = om.org_id)))\n  WHERE ((om.user_id = ( SELECT auth.uid() AS uid)) AND (p.id = runs.project_id))))"
+        },
+        {
+          "policyname": "Users can view runs in their projects",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM (projects p\n     JOIN org_members om ON ((p.org_id = om.org_id)))\n  WHERE ((om.user_id = ( SELECT auth.uid() AS uid)) AND (p.id = runs.project_id))))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "system_settings": {
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": "uuid_generate_v4()"
+        },
+        {
+          "column_name": "setting_key",
+          "data_type": "character varying",
+          "udt_name": "varchar",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "setting_value",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "id"
+      ],
+      "fks": [],
+      "indexes": [
+        {
+          "indexname": "system_settings_pkey",
+          "indexdef": "CREATE UNIQUE INDEX system_settings_pkey ON public.system_settings USING btree (id)"
+        },
+        {
+          "indexname": "system_settings_setting_key_key",
+          "indexdef": "CREATE UNIQUE INDEX system_settings_setting_key_key ON public.system_settings USING btree (setting_key)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Allow all operations for authenticated users",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "true",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "user_agents": {
+      "columns": [
+        {
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "agent_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "user_id",
+        "agent_id"
+      ],
+      "fks": [
+        {
+          "conname": "user_agents_agent_id_fkey",
+          "definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE"
+        },
+        {
+          "conname": "user_agents_user_id_fkey",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "user_agents_pkey",
+          "indexdef": "CREATE UNIQUE INDEX user_agents_pkey ON public.user_agents USING btree (user_id, agent_id)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Admins have full access to user_agents",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM user_roles\n  WHERE ((user_roles.user_id = ( SELECT auth.uid() AS uid)) AND (user_roles.role = 'admin'::text))))",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can view their own agent associations",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "(user_id = ( SELECT auth.uid() AS uid))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    },
+    "user_roles": {
+      "columns": [
+        {
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "role",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()"
+        }
+      ],
+      "pks": [
+        "user_id",
+        "role"
+      ],
+      "fks": [
+        {
+          "conname": "user_roles_user_id_fkey",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "idx_user_roles_user_id",
+          "indexdef": "CREATE INDEX idx_user_roles_user_id ON public.user_roles USING btree (user_id)"
+        },
+        {
+          "indexname": "user_roles_pkey",
+          "indexdef": "CREATE UNIQUE INDEX user_roles_pkey ON public.user_roles USING btree (user_id, role)"
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "Admins have full access to user_roles",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "using": "(EXISTS ( SELECT 1\n   FROM user_roles user_roles_1\n  WHERE ((user_roles_1.user_id = ( SELECT auth.uid() AS uid)) AND (user_roles_1.role = 'admin'::text))))",
+          "with_check": null
+        },
+        {
+          "policyname": "Users can view their own roles",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "using": "(user_id = ( SELECT auth.uid() AS uid))",
+          "with_check": null
+        }
+      ],
+      "rls": {
+        "relrowsecurity": true,
+        "relforcerowsecurity": false
+      }
+    }
+  }
+}

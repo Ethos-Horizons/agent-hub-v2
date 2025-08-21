@@ -1,0 +1,674 @@
+[
+    {
+      "constraint_name": "audit_log_entries_pkey",
+      "schema_name": "auth",
+      "table_name": "audit_log_entries",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "flow_state_pkey",
+      "schema_name": "auth",
+      "table_name": "flow_state",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "identities_user_id_fkey",
+      "schema_name": "auth",
+      "table_name": "identities",
+      "constraint_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "identities_pkey",
+      "schema_name": "auth",
+      "table_name": "identities",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "identities_provider_id_provider_unique",
+      "schema_name": "auth",
+      "table_name": "identities",
+      "constraint_definition": "UNIQUE (provider_id, provider)",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "constraint_name": "instances_pkey",
+      "schema_name": "auth",
+      "table_name": "instances",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "mfa_amr_claims_session_id_fkey",
+      "schema_name": "auth",
+      "table_name": "mfa_amr_claims",
+      "constraint_definition": "FOREIGN KEY (session_id) REFERENCES auth.sessions(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "amr_id_pk",
+      "schema_name": "auth",
+      "table_name": "mfa_amr_claims",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "mfa_amr_claims_session_id_authentication_method_pkey",
+      "schema_name": "auth",
+      "table_name": "mfa_amr_claims",
+      "constraint_definition": "UNIQUE (session_id, authentication_method)",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "constraint_name": "mfa_challenges_auth_factor_id_fkey",
+      "schema_name": "auth",
+      "table_name": "mfa_challenges",
+      "constraint_definition": "FOREIGN KEY (factor_id) REFERENCES auth.mfa_factors(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "mfa_challenges_pkey",
+      "schema_name": "auth",
+      "table_name": "mfa_challenges",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "mfa_factors_user_id_fkey",
+      "schema_name": "auth",
+      "table_name": "mfa_factors",
+      "constraint_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "mfa_factors_pkey",
+      "schema_name": "auth",
+      "table_name": "mfa_factors",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "mfa_factors_last_challenged_at_key",
+      "schema_name": "auth",
+      "table_name": "mfa_factors",
+      "constraint_definition": "UNIQUE (last_challenged_at)",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "constraint_name": "one_time_tokens_token_hash_check",
+      "schema_name": "auth",
+      "table_name": "one_time_tokens",
+      "constraint_definition": "CHECK ((char_length(token_hash) > 0))",
+      "constraint_type": "CHECK"
+    },
+    {
+      "constraint_name": "one_time_tokens_user_id_fkey",
+      "schema_name": "auth",
+      "table_name": "one_time_tokens",
+      "constraint_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "one_time_tokens_pkey",
+      "schema_name": "auth",
+      "table_name": "one_time_tokens",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "refresh_tokens_session_id_fkey",
+      "schema_name": "auth",
+      "table_name": "refresh_tokens",
+      "constraint_definition": "FOREIGN KEY (session_id) REFERENCES auth.sessions(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "refresh_tokens_pkey",
+      "schema_name": "auth",
+      "table_name": "refresh_tokens",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "refresh_tokens_token_unique",
+      "schema_name": "auth",
+      "table_name": "refresh_tokens",
+      "constraint_definition": "UNIQUE (token)",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "constraint_name": "entity_id not empty",
+      "schema_name": "auth",
+      "table_name": "saml_providers",
+      "constraint_definition": "CHECK ((char_length(entity_id) > 0))",
+      "constraint_type": "CHECK"
+    },
+    {
+      "constraint_name": "metadata_url not empty",
+      "schema_name": "auth",
+      "table_name": "saml_providers",
+      "constraint_definition": "CHECK (((metadata_url = NULL::text) OR (char_length(metadata_url) > 0)))",
+      "constraint_type": "CHECK"
+    },
+    {
+      "constraint_name": "metadata_xml not empty",
+      "schema_name": "auth",
+      "table_name": "saml_providers",
+      "constraint_definition": "CHECK ((char_length(metadata_xml) > 0))",
+      "constraint_type": "CHECK"
+    },
+    {
+      "constraint_name": "saml_providers_sso_provider_id_fkey",
+      "schema_name": "auth",
+      "table_name": "saml_providers",
+      "constraint_definition": "FOREIGN KEY (sso_provider_id) REFERENCES auth.sso_providers(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "saml_providers_pkey",
+      "schema_name": "auth",
+      "table_name": "saml_providers",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "saml_providers_entity_id_key",
+      "schema_name": "auth",
+      "table_name": "saml_providers",
+      "constraint_definition": "UNIQUE (entity_id)",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "constraint_name": "request_id not empty",
+      "schema_name": "auth",
+      "table_name": "saml_relay_states",
+      "constraint_definition": "CHECK ((char_length(request_id) > 0))",
+      "constraint_type": "CHECK"
+    },
+    {
+      "constraint_name": "saml_relay_states_flow_state_id_fkey",
+      "schema_name": "auth",
+      "table_name": "saml_relay_states",
+      "constraint_definition": "FOREIGN KEY (flow_state_id) REFERENCES auth.flow_state(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "saml_relay_states_sso_provider_id_fkey",
+      "schema_name": "auth",
+      "table_name": "saml_relay_states",
+      "constraint_definition": "FOREIGN KEY (sso_provider_id) REFERENCES auth.sso_providers(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "saml_relay_states_pkey",
+      "schema_name": "auth",
+      "table_name": "saml_relay_states",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "schema_migrations_pkey",
+      "schema_name": "auth",
+      "table_name": "schema_migrations",
+      "constraint_definition": "PRIMARY KEY (version)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "sessions_user_id_fkey",
+      "schema_name": "auth",
+      "table_name": "sessions",
+      "constraint_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "sessions_pkey",
+      "schema_name": "auth",
+      "table_name": "sessions",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "domain not empty",
+      "schema_name": "auth",
+      "table_name": "sso_domains",
+      "constraint_definition": "CHECK ((char_length(domain) > 0))",
+      "constraint_type": "CHECK"
+    },
+    {
+      "constraint_name": "sso_domains_sso_provider_id_fkey",
+      "schema_name": "auth",
+      "table_name": "sso_domains",
+      "constraint_definition": "FOREIGN KEY (sso_provider_id) REFERENCES auth.sso_providers(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "sso_domains_pkey",
+      "schema_name": "auth",
+      "table_name": "sso_domains",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "resource_id not empty",
+      "schema_name": "auth",
+      "table_name": "sso_providers",
+      "constraint_definition": "CHECK (((resource_id = NULL::text) OR (char_length(resource_id) > 0)))",
+      "constraint_type": "CHECK"
+    },
+    {
+      "constraint_name": "sso_providers_pkey",
+      "schema_name": "auth",
+      "table_name": "sso_providers",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "users_email_change_confirm_status_check",
+      "schema_name": "auth",
+      "table_name": "users",
+      "constraint_definition": "CHECK (((email_change_confirm_status >= 0) AND (email_change_confirm_status <= 2)))",
+      "constraint_type": "CHECK"
+    },
+    {
+      "constraint_name": "users_pkey",
+      "schema_name": "auth",
+      "table_name": "users",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "users_phone_key",
+      "schema_name": "auth",
+      "table_name": "users",
+      "constraint_definition": "UNIQUE (phone)",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "constraint_name": "agent_memories_agent_id_fkey",
+      "schema_name": "public",
+      "table_name": "agent_memories",
+      "constraint_definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "agent_memories_pkey",
+      "schema_name": "public",
+      "table_name": "agent_memories",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "agent_skills_agent_id_fkey",
+      "schema_name": "public",
+      "table_name": "agent_skills",
+      "constraint_definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "agent_skills_pkey",
+      "schema_name": "public",
+      "table_name": "agent_skills",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "agents_pkey",
+      "schema_name": "public",
+      "table_name": "agents",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "api_keys_pkey",
+      "schema_name": "public",
+      "table_name": "api_keys",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "artifacts_run_id_fkey",
+      "schema_name": "public",
+      "table_name": "artifacts",
+      "constraint_definition": "FOREIGN KEY (run_id) REFERENCES runs(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "artifacts_pkey",
+      "schema_name": "public",
+      "table_name": "artifacts",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "conversation_context_agent_id_fkey",
+      "schema_name": "public",
+      "table_name": "conversation_context",
+      "constraint_definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "conversation_context_conversation_id_fkey",
+      "schema_name": "public",
+      "table_name": "conversation_context",
+      "constraint_definition": "FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "conversation_context_pkey",
+      "schema_name": "public",
+      "table_name": "conversation_context",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "conversations_pkey",
+      "schema_name": "public",
+      "table_name": "conversations",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "knowledge_base_agent_id_fkey",
+      "schema_name": "public",
+      "table_name": "knowledge_base",
+      "constraint_definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "knowledge_base_pkey",
+      "schema_name": "public",
+      "table_name": "knowledge_base",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "leads_conversation_id_fkey",
+      "schema_name": "public",
+      "table_name": "leads",
+      "constraint_definition": "FOREIGN KEY (conversation_id) REFERENCES conversations(id)",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "leads_pkey",
+      "schema_name": "public",
+      "table_name": "leads",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "memory_project_id_fkey",
+      "schema_name": "public",
+      "table_name": "memory",
+      "constraint_definition": "FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "memory_pkey",
+      "schema_name": "public",
+      "table_name": "memory",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "messages_message_type_check",
+      "schema_name": "public",
+      "table_name": "messages",
+      "constraint_definition": "CHECK (((message_type)::text = ANY (ARRAY[('user'::character varying)::text, ('bot'::character varying)::text])))",
+      "constraint_type": "CHECK"
+    },
+    {
+      "constraint_name": "messages_conversation_id_fkey",
+      "schema_name": "public",
+      "table_name": "messages",
+      "constraint_definition": "FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "messages_pkey",
+      "schema_name": "public",
+      "table_name": "messages",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "org_members_org_id_fkey",
+      "schema_name": "public",
+      "table_name": "org_members",
+      "constraint_definition": "FOREIGN KEY (org_id) REFERENCES orgs(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "org_members_user_id_fkey",
+      "schema_name": "public",
+      "table_name": "org_members",
+      "constraint_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "org_members_pkey",
+      "schema_name": "public",
+      "table_name": "org_members",
+      "constraint_definition": "PRIMARY KEY (org_id, user_id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "organizations_pkey",
+      "schema_name": "public",
+      "table_name": "organizations",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "organizations_slug_key",
+      "schema_name": "public",
+      "table_name": "organizations",
+      "constraint_definition": "UNIQUE (slug)",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "constraint_name": "orgs_pkey",
+      "schema_name": "public",
+      "table_name": "orgs",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "orgs_slug_key",
+      "schema_name": "public",
+      "table_name": "orgs",
+      "constraint_definition": "UNIQUE (slug)",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "constraint_name": "profiles_id_fkey",
+      "schema_name": "public",
+      "table_name": "profiles",
+      "constraint_definition": "FOREIGN KEY (id) REFERENCES auth.users(id)",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "profiles_pkey",
+      "schema_name": "public",
+      "table_name": "profiles",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "projects_org_id_fkey",
+      "schema_name": "public",
+      "table_name": "projects",
+      "constraint_definition": "FOREIGN KEY (org_id) REFERENCES orgs(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "projects_pkey",
+      "schema_name": "public",
+      "table_name": "projects",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "runs_project_id_fkey",
+      "schema_name": "public",
+      "table_name": "runs",
+      "constraint_definition": "FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "runs_pkey",
+      "schema_name": "public",
+      "table_name": "runs",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "system_settings_pkey",
+      "schema_name": "public",
+      "table_name": "system_settings",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "system_settings_setting_key_key",
+      "schema_name": "public",
+      "table_name": "system_settings",
+      "constraint_definition": "UNIQUE (setting_key)",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "constraint_name": "user_agents_agent_id_fkey",
+      "schema_name": "public",
+      "table_name": "user_agents",
+      "constraint_definition": "FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "user_agents_user_id_fkey",
+      "schema_name": "public",
+      "table_name": "user_agents",
+      "constraint_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "user_agents_pkey",
+      "schema_name": "public",
+      "table_name": "user_agents",
+      "constraint_definition": "PRIMARY KEY (user_id, agent_id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "user_roles_user_id_fkey",
+      "schema_name": "public",
+      "table_name": "user_roles",
+      "constraint_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "user_roles_pkey",
+      "schema_name": "public",
+      "table_name": "user_roles",
+      "constraint_definition": "PRIMARY KEY (user_id, role)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "messages_pkey",
+      "schema_name": "realtime",
+      "table_name": "messages",
+      "constraint_definition": "PRIMARY KEY (id, inserted_at)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "schema_migrations_pkey",
+      "schema_name": "realtime",
+      "table_name": "schema_migrations",
+      "constraint_definition": "PRIMARY KEY (version)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "pk_subscription",
+      "schema_name": "realtime",
+      "table_name": "subscription",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "buckets_pkey",
+      "schema_name": "storage",
+      "table_name": "buckets",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "migrations_pkey",
+      "schema_name": "storage",
+      "table_name": "migrations",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "migrations_name_key",
+      "schema_name": "storage",
+      "table_name": "migrations",
+      "constraint_definition": "UNIQUE (name)",
+      "constraint_type": "UNIQUE"
+    },
+    {
+      "constraint_name": "objects_bucketId_fkey",
+      "schema_name": "storage",
+      "table_name": "objects",
+      "constraint_definition": "FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id)",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "objects_pkey",
+      "schema_name": "storage",
+      "table_name": "objects",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "s3_multipart_uploads_bucket_id_fkey",
+      "schema_name": "storage",
+      "table_name": "s3_multipart_uploads",
+      "constraint_definition": "FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id)",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "s3_multipart_uploads_pkey",
+      "schema_name": "storage",
+      "table_name": "s3_multipart_uploads",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "s3_multipart_uploads_parts_bucket_id_fkey",
+      "schema_name": "storage",
+      "table_name": "s3_multipart_uploads_parts",
+      "constraint_definition": "FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id)",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "s3_multipart_uploads_parts_upload_id_fkey",
+      "schema_name": "storage",
+      "table_name": "s3_multipart_uploads_parts",
+      "constraint_definition": "FOREIGN KEY (upload_id) REFERENCES storage.s3_multipart_uploads(id) ON DELETE CASCADE",
+      "constraint_type": "FOREIGN KEY"
+    },
+    {
+      "constraint_name": "s3_multipart_uploads_parts_pkey",
+      "schema_name": "storage",
+      "table_name": "s3_multipart_uploads_parts",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    },
+    {
+      "constraint_name": "secrets_pkey",
+      "schema_name": "vault",
+      "table_name": "secrets",
+      "constraint_definition": "PRIMARY KEY (id)",
+      "constraint_type": "PRIMARY KEY"
+    }
+  ]

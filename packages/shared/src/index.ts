@@ -19,26 +19,7 @@ export type RunRequestT = z.infer<typeof RunRequest>;
 export type RunStatusT = z.infer<typeof RunStatus>;
 
 // n8n callback schema
-export const N8nCallbackPayload = z.object({
-  runId: z.string().uuid(),
-  status: z.enum(["success", "error", "running", "queued"]).default("success"),
-  output: z.any().optional(),
-  artifacts: z
-    .array(
-      z.object({
-        kind: z.string(),
-        title: z.string().nullable().optional(),
-        url: z.string().nullable().optional(),
-        content: z.string().nullable().optional(),
-      })
-    )
-    .optional(),
-  costUsd: z.number().optional(),
-  latencyMs: z.number().optional(),
-  error: z.string().optional(),
-});
-
-export type N8nCallbackPayloadT = z.infer<typeof N8nCallbackPayload>;
+// Legacy n8n callback schema removed
 
 // Conversation-specific schemas for chatbot integration
 export const ConversationRequest = z.object({

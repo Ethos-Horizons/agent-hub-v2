@@ -324,7 +324,8 @@ export interface RunRow {
   agent: string;
   input: any;
   output: any | null;
-  n8n_execution_id: string | null;
+  // legacy: n8n removed
+  n8n_execution_id?: string | null;
   error: string | null;
   status: string;
   cost_usd: number | null;
@@ -339,6 +340,7 @@ export interface RunInsert {
   agent: string;
   input: any;
   output?: any | null;
+  // legacy: n8n removed
   n8n_execution_id?: string | null;
   error?: string | null;
   status?: string;

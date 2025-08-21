@@ -1,0 +1,1217 @@
+[
+    {
+      "schema_name": "auth",
+      "table_name": "audit_log_entries",
+      "index_name": "audit_log_entries_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX audit_log_entries_pkey ON auth.audit_log_entries USING btree (id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "audit_log_entries",
+      "index_name": "audit_logs_instance_id_idx",
+      "column_name": "instance_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX audit_logs_instance_id_idx ON auth.audit_log_entries USING btree (instance_id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "flow_state",
+      "index_name": "flow_state_created_at_idx",
+      "column_name": "created_at",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX flow_state_created_at_idx ON auth.flow_state USING btree (created_at DESC)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "flow_state",
+      "index_name": "flow_state_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX flow_state_pkey ON auth.flow_state USING btree (id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "flow_state",
+      "index_name": "idx_auth_code",
+      "column_name": "auth_code",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX idx_auth_code ON auth.flow_state USING btree (auth_code)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "flow_state",
+      "index_name": "idx_user_id_auth_method",
+      "column_name": "user_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX idx_user_id_auth_method ON auth.flow_state USING btree (user_id, authentication_method)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "flow_state",
+      "index_name": "idx_user_id_auth_method",
+      "column_name": "authentication_method",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX idx_user_id_auth_method ON auth.flow_state USING btree (user_id, authentication_method)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "identities",
+      "index_name": "identities_email_idx",
+      "column_name": "email",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX identities_email_idx ON auth.identities USING btree (email text_pattern_ops)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "identities",
+      "index_name": "identities_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX identities_pkey ON auth.identities USING btree (id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "identities",
+      "index_name": "identities_provider_id_provider_unique",
+      "column_name": "provider_id",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX identities_provider_id_provider_unique ON auth.identities USING btree (provider_id, provider)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "identities",
+      "index_name": "identities_provider_id_provider_unique",
+      "column_name": "provider",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX identities_provider_id_provider_unique ON auth.identities USING btree (provider_id, provider)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "identities",
+      "index_name": "identities_user_id_idx",
+      "column_name": "user_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX identities_user_id_idx ON auth.identities USING btree (user_id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "instances",
+      "index_name": "instances_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX instances_pkey ON auth.instances USING btree (id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "mfa_amr_claims",
+      "index_name": "amr_id_pk",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX amr_id_pk ON auth.mfa_amr_claims USING btree (id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "mfa_amr_claims",
+      "index_name": "mfa_amr_claims_session_id_authentication_method_pkey",
+      "column_name": "session_id",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX mfa_amr_claims_session_id_authentication_method_pkey ON auth.mfa_amr_claims USING btree (session_id, authentication_method)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "mfa_amr_claims",
+      "index_name": "mfa_amr_claims_session_id_authentication_method_pkey",
+      "column_name": "authentication_method",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX mfa_amr_claims_session_id_authentication_method_pkey ON auth.mfa_amr_claims USING btree (session_id, authentication_method)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "mfa_challenges",
+      "index_name": "mfa_challenge_created_at_idx",
+      "column_name": "created_at",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX mfa_challenge_created_at_idx ON auth.mfa_challenges USING btree (created_at DESC)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "mfa_challenges",
+      "index_name": "mfa_challenges_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX mfa_challenges_pkey ON auth.mfa_challenges USING btree (id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "mfa_factors",
+      "index_name": "factor_id_created_at_idx",
+      "column_name": "user_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX factor_id_created_at_idx ON auth.mfa_factors USING btree (user_id, created_at)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "mfa_factors",
+      "index_name": "factor_id_created_at_idx",
+      "column_name": "created_at",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX factor_id_created_at_idx ON auth.mfa_factors USING btree (user_id, created_at)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "mfa_factors",
+      "index_name": "mfa_factors_last_challenged_at_key",
+      "column_name": "last_challenged_at",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX mfa_factors_last_challenged_at_key ON auth.mfa_factors USING btree (last_challenged_at)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "mfa_factors",
+      "index_name": "mfa_factors_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX mfa_factors_pkey ON auth.mfa_factors USING btree (id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "mfa_factors",
+      "index_name": "mfa_factors_user_friendly_name_unique",
+      "column_name": "user_id",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX mfa_factors_user_friendly_name_unique ON auth.mfa_factors USING btree (friendly_name, user_id) WHERE (TRIM(BOTH FROM friendly_name) <> ''::text)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "mfa_factors",
+      "index_name": "mfa_factors_user_friendly_name_unique",
+      "column_name": "friendly_name",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX mfa_factors_user_friendly_name_unique ON auth.mfa_factors USING btree (friendly_name, user_id) WHERE (TRIM(BOTH FROM friendly_name) <> ''::text)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "mfa_factors",
+      "index_name": "mfa_factors_user_id_idx",
+      "column_name": "user_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX mfa_factors_user_id_idx ON auth.mfa_factors USING btree (user_id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "mfa_factors",
+      "index_name": "unique_phone_factor_per_user",
+      "column_name": "user_id",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX unique_phone_factor_per_user ON auth.mfa_factors USING btree (user_id, phone)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "mfa_factors",
+      "index_name": "unique_phone_factor_per_user",
+      "column_name": "phone",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX unique_phone_factor_per_user ON auth.mfa_factors USING btree (user_id, phone)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "one_time_tokens",
+      "index_name": "one_time_tokens_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX one_time_tokens_pkey ON auth.one_time_tokens USING btree (id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "one_time_tokens",
+      "index_name": "one_time_tokens_relates_to_hash_idx",
+      "column_name": "relates_to",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX one_time_tokens_relates_to_hash_idx ON auth.one_time_tokens USING hash (relates_to)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "one_time_tokens",
+      "index_name": "one_time_tokens_token_hash_hash_idx",
+      "column_name": "token_hash",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX one_time_tokens_token_hash_hash_idx ON auth.one_time_tokens USING hash (token_hash)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "one_time_tokens",
+      "index_name": "one_time_tokens_user_id_token_type_key",
+      "column_name": "user_id",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX one_time_tokens_user_id_token_type_key ON auth.one_time_tokens USING btree (user_id, token_type)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "one_time_tokens",
+      "index_name": "one_time_tokens_user_id_token_type_key",
+      "column_name": "token_type",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX one_time_tokens_user_id_token_type_key ON auth.one_time_tokens USING btree (user_id, token_type)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "refresh_tokens",
+      "index_name": "refresh_tokens_instance_id_idx",
+      "column_name": "instance_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX refresh_tokens_instance_id_idx ON auth.refresh_tokens USING btree (instance_id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "refresh_tokens",
+      "index_name": "refresh_tokens_instance_id_user_id_idx",
+      "column_name": "instance_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX refresh_tokens_instance_id_user_id_idx ON auth.refresh_tokens USING btree (instance_id, user_id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "refresh_tokens",
+      "index_name": "refresh_tokens_instance_id_user_id_idx",
+      "column_name": "user_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX refresh_tokens_instance_id_user_id_idx ON auth.refresh_tokens USING btree (instance_id, user_id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "refresh_tokens",
+      "index_name": "refresh_tokens_parent_idx",
+      "column_name": "parent",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX refresh_tokens_parent_idx ON auth.refresh_tokens USING btree (parent)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "refresh_tokens",
+      "index_name": "refresh_tokens_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX refresh_tokens_pkey ON auth.refresh_tokens USING btree (id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "refresh_tokens",
+      "index_name": "refresh_tokens_session_id_revoked_idx",
+      "column_name": "revoked",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX refresh_tokens_session_id_revoked_idx ON auth.refresh_tokens USING btree (session_id, revoked)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "refresh_tokens",
+      "index_name": "refresh_tokens_session_id_revoked_idx",
+      "column_name": "session_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX refresh_tokens_session_id_revoked_idx ON auth.refresh_tokens USING btree (session_id, revoked)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "refresh_tokens",
+      "index_name": "refresh_tokens_token_unique",
+      "column_name": "token",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX refresh_tokens_token_unique ON auth.refresh_tokens USING btree (token)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "refresh_tokens",
+      "index_name": "refresh_tokens_updated_at_idx",
+      "column_name": "updated_at",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX refresh_tokens_updated_at_idx ON auth.refresh_tokens USING btree (updated_at DESC)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "saml_providers",
+      "index_name": "saml_providers_entity_id_key",
+      "column_name": "entity_id",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX saml_providers_entity_id_key ON auth.saml_providers USING btree (entity_id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "saml_providers",
+      "index_name": "saml_providers_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX saml_providers_pkey ON auth.saml_providers USING btree (id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "saml_providers",
+      "index_name": "saml_providers_sso_provider_id_idx",
+      "column_name": "sso_provider_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX saml_providers_sso_provider_id_idx ON auth.saml_providers USING btree (sso_provider_id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "saml_relay_states",
+      "index_name": "saml_relay_states_created_at_idx",
+      "column_name": "created_at",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX saml_relay_states_created_at_idx ON auth.saml_relay_states USING btree (created_at DESC)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "saml_relay_states",
+      "index_name": "saml_relay_states_for_email_idx",
+      "column_name": "for_email",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX saml_relay_states_for_email_idx ON auth.saml_relay_states USING btree (for_email)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "saml_relay_states",
+      "index_name": "saml_relay_states_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX saml_relay_states_pkey ON auth.saml_relay_states USING btree (id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "saml_relay_states",
+      "index_name": "saml_relay_states_sso_provider_id_idx",
+      "column_name": "sso_provider_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX saml_relay_states_sso_provider_id_idx ON auth.saml_relay_states USING btree (sso_provider_id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "schema_migrations",
+      "index_name": "schema_migrations_pkey",
+      "column_name": "version",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX schema_migrations_pkey ON auth.schema_migrations USING btree (version)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "sessions",
+      "index_name": "sessions_not_after_idx",
+      "column_name": "not_after",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX sessions_not_after_idx ON auth.sessions USING btree (not_after DESC)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "sessions",
+      "index_name": "sessions_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX sessions_pkey ON auth.sessions USING btree (id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "sessions",
+      "index_name": "sessions_user_id_idx",
+      "column_name": "user_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX sessions_user_id_idx ON auth.sessions USING btree (user_id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "sessions",
+      "index_name": "user_id_created_at_idx",
+      "column_name": "user_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX user_id_created_at_idx ON auth.sessions USING btree (user_id, created_at)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "sessions",
+      "index_name": "user_id_created_at_idx",
+      "column_name": "created_at",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX user_id_created_at_idx ON auth.sessions USING btree (user_id, created_at)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "sso_domains",
+      "index_name": "sso_domains_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX sso_domains_pkey ON auth.sso_domains USING btree (id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "sso_domains",
+      "index_name": "sso_domains_sso_provider_id_idx",
+      "column_name": "sso_provider_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX sso_domains_sso_provider_id_idx ON auth.sso_domains USING btree (sso_provider_id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "sso_providers",
+      "index_name": "sso_providers_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX sso_providers_pkey ON auth.sso_providers USING btree (id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "sso_providers",
+      "index_name": "sso_providers_resource_id_pattern_idx",
+      "column_name": "resource_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX sso_providers_resource_id_pattern_idx ON auth.sso_providers USING btree (resource_id text_pattern_ops)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "users",
+      "index_name": "confirmation_token_idx",
+      "column_name": "confirmation_token",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX confirmation_token_idx ON auth.users USING btree (confirmation_token) WHERE ((confirmation_token)::text !~ '^[0-9 ]*$'::text)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "users",
+      "index_name": "email_change_token_current_idx",
+      "column_name": "email_change_token_current",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX email_change_token_current_idx ON auth.users USING btree (email_change_token_current) WHERE ((email_change_token_current)::text !~ '^[0-9 ]*$'::text)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "users",
+      "index_name": "email_change_token_new_idx",
+      "column_name": "email_change_token_new",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX email_change_token_new_idx ON auth.users USING btree (email_change_token_new) WHERE ((email_change_token_new)::text !~ '^[0-9 ]*$'::text)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "users",
+      "index_name": "reauthentication_token_idx",
+      "column_name": "reauthentication_token",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX reauthentication_token_idx ON auth.users USING btree (reauthentication_token) WHERE ((reauthentication_token)::text !~ '^[0-9 ]*$'::text)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "users",
+      "index_name": "recovery_token_idx",
+      "column_name": "recovery_token",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX recovery_token_idx ON auth.users USING btree (recovery_token) WHERE ((recovery_token)::text !~ '^[0-9 ]*$'::text)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "users",
+      "index_name": "users_email_partial_key",
+      "column_name": "email",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX users_email_partial_key ON auth.users USING btree (email) WHERE (is_sso_user = false)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "users",
+      "index_name": "users_instance_id_email_idx",
+      "column_name": "instance_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX users_instance_id_email_idx ON auth.users USING btree (instance_id, lower((email)::text))"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "users",
+      "index_name": "users_instance_id_idx",
+      "column_name": "instance_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX users_instance_id_idx ON auth.users USING btree (instance_id)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "users",
+      "index_name": "users_is_anonymous_idx",
+      "column_name": "is_anonymous",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX users_is_anonymous_idx ON auth.users USING btree (is_anonymous)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "users",
+      "index_name": "users_phone_key",
+      "column_name": "phone",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX users_phone_key ON auth.users USING btree (phone)"
+    },
+    {
+      "schema_name": "auth",
+      "table_name": "users",
+      "index_name": "users_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX users_pkey ON auth.users USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "agent_memories",
+      "index_name": "agent_memories_agent_id_idx",
+      "column_name": "agent_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX agent_memories_agent_id_idx ON public.agent_memories USING btree (agent_id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "agent_memories",
+      "index_name": "agent_memories_created_at_idx",
+      "column_name": "created_at",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX agent_memories_created_at_idx ON public.agent_memories USING btree (created_at)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "agent_memories",
+      "index_name": "agent_memories_embedding_idx",
+      "column_name": "embedding",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX agent_memories_embedding_idx ON public.agent_memories USING ivfflat (embedding vector_cosine_ops) WITH (lists='100')"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "agent_memories",
+      "index_name": "agent_memories_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX agent_memories_pkey ON public.agent_memories USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "agent_skills",
+      "index_name": "agent_skills_agent_id_idx",
+      "column_name": "agent_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX agent_skills_agent_id_idx ON public.agent_skills USING btree (agent_id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "agent_skills",
+      "index_name": "agent_skills_embedding_idx",
+      "column_name": "embedding",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX agent_skills_embedding_idx ON public.agent_skills USING ivfflat (embedding vector_cosine_ops) WITH (lists='100')"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "agent_skills",
+      "index_name": "agent_skills_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX agent_skills_pkey ON public.agent_skills USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "agents",
+      "index_name": "agents_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX agents_pkey ON public.agents USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "api_keys",
+      "index_name": "api_keys_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX api_keys_pkey ON public.api_keys USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "artifacts",
+      "index_name": "artifacts_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX artifacts_pkey ON public.artifacts USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "conversation_context",
+      "index_name": "conversation_context_conversation_id_idx",
+      "column_name": "conversation_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX conversation_context_conversation_id_idx ON public.conversation_context USING btree (conversation_id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "conversation_context",
+      "index_name": "conversation_context_embedding_idx",
+      "column_name": "embedding",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX conversation_context_embedding_idx ON public.conversation_context USING ivfflat (embedding vector_cosine_ops) WITH (lists='100')"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "conversation_context",
+      "index_name": "conversation_context_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX conversation_context_pkey ON public.conversation_context USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "conversations",
+      "index_name": "conversations_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX conversations_pkey ON public.conversations USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "knowledge_base",
+      "index_name": "knowledge_base_agent_id_idx",
+      "column_name": "agent_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX knowledge_base_agent_id_idx ON public.knowledge_base USING btree (agent_id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "knowledge_base",
+      "index_name": "knowledge_base_embedding_idx",
+      "column_name": "embedding",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX knowledge_base_embedding_idx ON public.knowledge_base USING ivfflat (embedding vector_cosine_ops) WITH (lists='100')"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "knowledge_base",
+      "index_name": "knowledge_base_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX knowledge_base_pkey ON public.knowledge_base USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "leads",
+      "index_name": "leads_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX leads_pkey ON public.leads USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "memory",
+      "index_name": "idx_memory_project_id",
+      "column_name": "project_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX idx_memory_project_id ON public.memory USING btree (project_id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "memory",
+      "index_name": "memory_embedding_idx",
+      "column_name": "embedding",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX memory_embedding_idx ON public.memory USING ivfflat (embedding vector_cosine_ops) WITH (lists='100')"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "memory",
+      "index_name": "memory_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX memory_pkey ON public.memory USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "messages",
+      "index_name": "messages_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX messages_pkey ON public.messages USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "org_members",
+      "index_name": "idx_org_members_user_id",
+      "column_name": "user_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX idx_org_members_user_id ON public.org_members USING btree (user_id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "org_members",
+      "index_name": "org_members_pkey",
+      "column_name": "org_id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX org_members_pkey ON public.org_members USING btree (org_id, user_id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "org_members",
+      "index_name": "org_members_pkey",
+      "column_name": "user_id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX org_members_pkey ON public.org_members USING btree (org_id, user_id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "organizations",
+      "index_name": "organizations_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX organizations_pkey ON public.organizations USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "organizations",
+      "index_name": "organizations_slug_key",
+      "column_name": "slug",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX organizations_slug_key ON public.organizations USING btree (slug)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "orgs",
+      "index_name": "orgs_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX orgs_pkey ON public.orgs USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "orgs",
+      "index_name": "orgs_slug_key",
+      "column_name": "slug",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX orgs_slug_key ON public.orgs USING btree (slug)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "profiles",
+      "index_name": "profiles_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "projects",
+      "index_name": "projects_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX projects_pkey ON public.projects USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "runs",
+      "index_name": "idx_runs_project_id",
+      "column_name": "project_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX idx_runs_project_id ON public.runs USING btree (project_id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "runs",
+      "index_name": "idx_runs_status",
+      "column_name": "status",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX idx_runs_status ON public.runs USING btree (status)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "runs",
+      "index_name": "runs_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX runs_pkey ON public.runs USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "system_settings",
+      "index_name": "system_settings_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX system_settings_pkey ON public.system_settings USING btree (id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "system_settings",
+      "index_name": "system_settings_setting_key_key",
+      "column_name": "setting_key",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX system_settings_setting_key_key ON public.system_settings USING btree (setting_key)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "user_agents",
+      "index_name": "user_agents_pkey",
+      "column_name": "user_id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX user_agents_pkey ON public.user_agents USING btree (user_id, agent_id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "user_agents",
+      "index_name": "user_agents_pkey",
+      "column_name": "agent_id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX user_agents_pkey ON public.user_agents USING btree (user_id, agent_id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "user_roles",
+      "index_name": "idx_user_roles_user_id",
+      "column_name": "user_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX idx_user_roles_user_id ON public.user_roles USING btree (user_id)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "user_roles",
+      "index_name": "user_roles_pkey",
+      "column_name": "user_id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX user_roles_pkey ON public.user_roles USING btree (user_id, role)"
+    },
+    {
+      "schema_name": "public",
+      "table_name": "user_roles",
+      "index_name": "user_roles_pkey",
+      "column_name": "role",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX user_roles_pkey ON public.user_roles USING btree (user_id, role)"
+    },
+    {
+      "schema_name": "realtime",
+      "table_name": "messages",
+      "index_name": "messages_pkey",
+      "column_name": "inserted_at",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX messages_pkey ON ONLY realtime.messages USING btree (id, inserted_at)"
+    },
+    {
+      "schema_name": "realtime",
+      "table_name": "messages",
+      "index_name": "messages_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX messages_pkey ON ONLY realtime.messages USING btree (id, inserted_at)"
+    },
+    {
+      "schema_name": "realtime",
+      "table_name": "schema_migrations",
+      "index_name": "schema_migrations_pkey",
+      "column_name": "version",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX schema_migrations_pkey ON realtime.schema_migrations USING btree (version)"
+    },
+    {
+      "schema_name": "realtime",
+      "table_name": "subscription",
+      "index_name": "ix_realtime_subscription_entity",
+      "column_name": "entity",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX ix_realtime_subscription_entity ON realtime.subscription USING btree (entity)"
+    },
+    {
+      "schema_name": "realtime",
+      "table_name": "subscription",
+      "index_name": "pk_subscription",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX pk_subscription ON realtime.subscription USING btree (id)"
+    },
+    {
+      "schema_name": "realtime",
+      "table_name": "subscription",
+      "index_name": "subscription_subscription_id_entity_filters_key",
+      "column_name": "subscription_id",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX subscription_subscription_id_entity_filters_key ON realtime.subscription USING btree (subscription_id, entity, filters)"
+    },
+    {
+      "schema_name": "realtime",
+      "table_name": "subscription",
+      "index_name": "subscription_subscription_id_entity_filters_key",
+      "column_name": "entity",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX subscription_subscription_id_entity_filters_key ON realtime.subscription USING btree (subscription_id, entity, filters)"
+    },
+    {
+      "schema_name": "realtime",
+      "table_name": "subscription",
+      "index_name": "subscription_subscription_id_entity_filters_key",
+      "column_name": "filters",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX subscription_subscription_id_entity_filters_key ON realtime.subscription USING btree (subscription_id, entity, filters)"
+    },
+    {
+      "schema_name": "storage",
+      "table_name": "buckets",
+      "index_name": "bname",
+      "column_name": "name",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX bname ON storage.buckets USING btree (name)"
+    },
+    {
+      "schema_name": "storage",
+      "table_name": "buckets",
+      "index_name": "buckets_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX buckets_pkey ON storage.buckets USING btree (id)"
+    },
+    {
+      "schema_name": "storage",
+      "table_name": "migrations",
+      "index_name": "migrations_name_key",
+      "column_name": "name",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX migrations_name_key ON storage.migrations USING btree (name)"
+    },
+    {
+      "schema_name": "storage",
+      "table_name": "migrations",
+      "index_name": "migrations_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX migrations_pkey ON storage.migrations USING btree (id)"
+    },
+    {
+      "schema_name": "storage",
+      "table_name": "objects",
+      "index_name": "bucketid_objname",
+      "column_name": "bucket_id",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX bucketid_objname ON storage.objects USING btree (bucket_id, name)"
+    },
+    {
+      "schema_name": "storage",
+      "table_name": "objects",
+      "index_name": "bucketid_objname",
+      "column_name": "name",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX bucketid_objname ON storage.objects USING btree (bucket_id, name)"
+    },
+    {
+      "schema_name": "storage",
+      "table_name": "objects",
+      "index_name": "idx_objects_bucket_id_name",
+      "column_name": "bucket_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX idx_objects_bucket_id_name ON storage.objects USING btree (bucket_id, name COLLATE \"C\")"
+    },
+    {
+      "schema_name": "storage",
+      "table_name": "objects",
+      "index_name": "idx_objects_bucket_id_name",
+      "column_name": "name",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX idx_objects_bucket_id_name ON storage.objects USING btree (bucket_id, name COLLATE \"C\")"
+    },
+    {
+      "schema_name": "storage",
+      "table_name": "objects",
+      "index_name": "name_prefix_search",
+      "column_name": "name",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX name_prefix_search ON storage.objects USING btree (name text_pattern_ops)"
+    },
+    {
+      "schema_name": "storage",
+      "table_name": "objects",
+      "index_name": "objects_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX objects_pkey ON storage.objects USING btree (id)"
+    },
+    {
+      "schema_name": "storage",
+      "table_name": "s3_multipart_uploads",
+      "index_name": "idx_multipart_uploads_list",
+      "column_name": "bucket_id",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX idx_multipart_uploads_list ON storage.s3_multipart_uploads USING btree (bucket_id, key, created_at)"
+    },
+    {
+      "schema_name": "storage",
+      "table_name": "s3_multipart_uploads",
+      "index_name": "idx_multipart_uploads_list",
+      "column_name": "key",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX idx_multipart_uploads_list ON storage.s3_multipart_uploads USING btree (bucket_id, key, created_at)"
+    },
+    {
+      "schema_name": "storage",
+      "table_name": "s3_multipart_uploads",
+      "index_name": "idx_multipart_uploads_list",
+      "column_name": "created_at",
+      "is_unique": false,
+      "is_primary": false,
+      "index_definition": "CREATE INDEX idx_multipart_uploads_list ON storage.s3_multipart_uploads USING btree (bucket_id, key, created_at)"
+    },
+    {
+      "schema_name": "storage",
+      "table_name": "s3_multipart_uploads",
+      "index_name": "s3_multipart_uploads_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX s3_multipart_uploads_pkey ON storage.s3_multipart_uploads USING btree (id)"
+    },
+    {
+      "schema_name": "storage",
+      "table_name": "s3_multipart_uploads_parts",
+      "index_name": "s3_multipart_uploads_parts_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX s3_multipart_uploads_parts_pkey ON storage.s3_multipart_uploads_parts USING btree (id)"
+    },
+    {
+      "schema_name": "vault",
+      "table_name": "secrets",
+      "index_name": "secrets_name_idx",
+      "column_name": "name",
+      "is_unique": true,
+      "is_primary": false,
+      "index_definition": "CREATE UNIQUE INDEX secrets_name_idx ON vault.secrets USING btree (name) WHERE (name IS NOT NULL)"
+    },
+    {
+      "schema_name": "vault",
+      "table_name": "secrets",
+      "index_name": "secrets_pkey",
+      "column_name": "id",
+      "is_unique": true,
+      "is_primary": true,
+      "index_definition": "CREATE UNIQUE INDEX secrets_pkey ON vault.secrets USING btree (id)"
+    }
+  ]

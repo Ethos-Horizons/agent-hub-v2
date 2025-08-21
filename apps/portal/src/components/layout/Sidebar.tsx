@@ -36,18 +36,24 @@ const navItems: NavItem[] = [
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const pathname = usePathname();
+
+  // Show full sidebar when hovered or when manually expanded
+  const isExpanded = !collapsed || isHovered;
 
   return (
     <div
       className={cn(
-        'flex flex-col bg-gray-900 border-r border-gray-800 transition-all duration-300',
-        collapsed ? 'w-16' : 'w-64'
+        'flex flex-col bg-gray-900 border-r border-gray-800 transition-all duration-300 relative group',
+        isExpanded ? 'w-64' : 'w-16'
       )}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-800">
-        {!collapsed && (
+        {isExpanded && (
           <div className="flex items-center gap-2">
             <Bot className="h-8 w-8 text-cyan-400" />
             <span className="text-xl font-bold text-white">Agent Hub</span>
@@ -85,14 +91,14 @@ export default function Sidebar() {
               )}
             >
               <item.icon className="h-5 w-5 flex-shrink-0" />
-              {!collapsed && <span>{item.label}</span>}
+              {isExpanded && <span>{item.label}</span>}
             </Link>
           );
         })}
       </nav>
 
       {/* Footer */}
-      {!collapsed && (
+      {isExpanded && (
         <div className="p-4 border-t border-gray-800">
           <div className="text-xs text-gray-400 text-center">
             AI-Powered Agent Creation

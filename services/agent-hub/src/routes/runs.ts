@@ -1,8 +1,7 @@
 import { Router } from "express";
 import { supabaseAdmin, broadcastRunUpdate } from "../lib/supabase.js";
-import { callN8n } from "../lib/n8n.js";
 import { startRunTrace, endRunTrace } from "../lib/langfuse.js";
-import { draftPlan } from "../lib/models.js";
+import { draftPlan, callOpenAI } from "../lib/models.js";
 import { logger } from "../lib/logger.js";
 import { RunRequest, createApiResponse } from "@agent-hub/shared";
 import { v4 as uuidv4 } from "uuid";
@@ -47,40 +46,49 @@ runsRouter.post("/", async (req, res) => {
       logger.warn({ e }, "Langfuse start failed")
     );
 
-    // Execute n8n workflow
+    // Execute agent locally (AI-powered)
     try {
-      const n8nResp = await callN8n(agent, { runId, projectId, input });
-      
-      if (n8nResp?.executionId) {
-        await supabaseAdmin
-          .from("runs")
-          .update({ n8n_execution_id: n8nResp.executionId })
-          .eq("id", runId);
-      }
-      
-      // Broadcast start status
+      // Simple placeholder: call OpenAI with a generic prompt
+      const prompt = `Run agent "${agent}" with input: ${JSON.stringify(input)}`;
+      const resultText = await callOpenAI(prompt, {
+        model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+        maxTokens: 800,
+        temperature: 0.4,
+      });
+
+      // Update run with output
+      await supabaseAdmin
+        .from("runs")
+        .update({ status: "success", output: { text: resultText } })
+        .eq("id", runId);
+
+      // Broadcast completion status
       await broadcastRunUpdate(runId, {
         type: "status",
-        payload: { runId, status: "running" },
+        payload: { runId, status: "success" },
       });
-      
+
+      await endRunTrace(runId, {
+        status: "success",
+        output: { text: resultText },
+      }).catch((e) => logger.warn({ e }, "Langfuse end failed"));
+
       return res.status(202).json(createApiResponse({ runId }));
-      
     } catch (error) {
-      logger.error({ err: error }, "n8n call failed");
-      
+      logger.error({ error }, "Local agent execution failed");
+
       // Update run as failed
       await supabaseAdmin
         .from("runs")
         .update({ status: "error", error: String(error) })
         .eq("id", runId);
-        
+
       await broadcastRunUpdate(runId, {
         type: "status",
         payload: { runId, status: "error", error: String(error) },
       });
-      
-      return res.status(500).json(createApiResponse({ runId }, "Workflow execution failed"));
+
+      return res.status(500).json(createApiResponse({ runId }, "Agent execution failed"));
     }
     
   } catch (error) {

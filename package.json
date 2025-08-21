@@ -17,16 +17,27 @@
     "clean": "npm run clean --workspaces && rimraf node_modules",
     "typecheck": "npm run typecheck --workspaces",
     "dev:check": "npm run typecheck && npm run lint",
-    "doctor": "node scripts/doctor.js"
+    "doctor": "node scripts/doctor.js",
+    "db:dump": "node --experimental-modules scripts/dump-db.mjs"
   },
   "eslintConfig": {
     "root": true,
-    "ignorePatterns": ["node_modules", "dist"],
+    "ignorePatterns": [
+      "node_modules",
+      "dist"
+    ],
     "overrides": [
       {
-        "files": ["**/*.ts", "**/*.tsx"],
-        "parserOptions": { "project": false },
-        "extends": ["eslint:recommended"],
+        "files": [
+          "**/*.ts",
+          "**/*.tsx"
+        ],
+        "parserOptions": {
+          "project": false
+        },
+        "extends": [
+          "eslint:recommended"
+        ],
         "rules": {}
       }
     ]
@@ -39,12 +50,15 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
-    "prettier": "^3.3.3",
     "eslint": "^8.57.0",
+    "prettier": "^3.3.3",
     "rimraf": "^5.0.0"
   },
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "postgres": "^3.4.7"
   }
 }
